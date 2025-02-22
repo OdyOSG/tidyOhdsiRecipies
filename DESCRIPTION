@@ -29,4 +29,5 @@ Imports:
     lifecycle,
     magrittr,
     rlang
-
+URL: https://github.com/OdyOSG/tidyOhdsiRecipies
+BugReports: https://github.com/OdyOSG/tidyOhdsiRecipies/issues
