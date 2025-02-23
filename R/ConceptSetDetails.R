@@ -25,13 +25,13 @@ getCaprCsDetails <- function(x, cdm) {
   }
 
   ids <- map_int(x@Expression, ~ .@Concept@concept_id)
-  df <- cdm[["concept"]] %>%
-    dplyr::filter(.data$concept_id %in% ids) %>%
-    dplyr::collect(.data) %>%
-    tibble::tibble(.data) %>%
+  df <- cdm[["concept"]] |>
+    dplyr::filter(.data$concept_id %in% ids) |>
+    dplyr::collect() |>
+    tibble::tibble() |>
     dplyr::mutate(
       invalid_reason = ifelse(is.na(.data$invalid_reason), "V", .data$invalid_reason)
-    ) %>%
+    ) |>
     dplyr::mutate(
       standard_concept_caption = dplyr::case_when(
         .data$standard_concept == "S" ~ "Standard",
@@ -39,7 +39,7 @@ getCaprCsDetails <- function(x, cdm) {
         .data$standard_concept == "C" ~ "Classification",
         TRUE ~ ""
       )
-    ) %>%
+    ) |>
     dplyr::mutate(
       invalid_reason_caption = dplyr::case_when(
         .data$invalid_reason == "V" ~ "Valid",

@@ -73,8 +73,12 @@ createCaprConceptSetCohort <- function(
     gsub("event_end_date", "fixed_exit", .exit)
   )
 
-  fnsCalls <- map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}")) |>
-    map(~ prepareCall(.x, list(conceptSet = conceptSet)))
+  fnsCalls <- map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}"))
+
+  fnsCalls <- purrr::map(
+    fnsCalls,
+    ~ prepareCall(.x, args = list(conceptSet = conceptSet)))
+
 
   .evals <- map_chr(
     seq_along(fnsCalls),
@@ -106,7 +110,7 @@ createCaprConceptSetCohort <- function(
   return(cohort)
 }
 
-capr_ref <- function(domain_id) {
+capr_ref <- function(domain_ids) {
   entry <- dplyr::tribble(
     ~domain_id, ~capr_spec,
     "condition", "conditionOccurrence",
@@ -116,8 +120,8 @@ capr_ref <- function(domain_id) {
     "measurement", "measurement",
     "visit", "visitOccurrence",
     "device", "deviceExposure"
-  ) |>
-    dplyr::filter(.data$domain_id %in% domain_id) |>
+  ) %>%
+    dplyr::filter(.data$domain_id %in% domain_ids) |>
     dplyr::pull(.data$capr_spec)
 }
 

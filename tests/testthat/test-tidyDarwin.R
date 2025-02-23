@@ -1,48 +1,14 @@
-#' Create Mock CDM Reference
-#'
-#' This function creates mock CDM data reference for testing purposes.
-#'
-#' @return cdm_reference via CDMConnector.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' mock_cdm <- tidyCdmMock()
-#' }
-tidyCdmMock <- function() {
-  numberIndividuals <- 10
+test_that("Tidy CDM Referrence test", {
+  numberIndividuals <- 1
   rlang::check_installed("duckdb")
   con <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
+  on.exit(duckdb::dbDisconnect(con))
   writeSchema <- "main"
-
   tables <- list(
-    "concept" = data.frame(),
-    "concept_relationship" = data.frame(),
     "observation_period" = data.frame(),
-    "person" = data.frame(),
-    "condition_occurrence" = data.frame(),
-    "drug_exposure" = data.frame()
+    "person" = data.frame()
   )
   omopgenerics::assertList(tables, named = TRUE, class = "data.frame")
-  tables[["concept_relationship"]] <- dplyr::tribble(
-    ~concept_id_1, ~concept_id_2, ~relationship_id, ~valid_start_date, ~valid_end_date,
-    35207953, 4133224, "Maps to", as.Date("2020-01-01"), as.Date("2020-01-01"),
-    45176377, 19102219, "Maps to", as.Date("2020-01-01"), as.Date("2020-01-01")
-  )
-  tables[["concept"]] <- dplyr::tribble(
-    ~concept_id, ~concept_name, ~concept_code, ~vocabulary_id,
-    ~domain_id, ~concept_class_id,
-    ~valid_start_date, ~valid_end_date, ~ invalid_reason,
-    ~ standard_concept,
-    35207953, "Lobar pneumonia, unspecified organism", "J18.1", "ICD10CM",
-    "Condition", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'N',
-    4133224, "Lobar pneumonia", "278516003", "SNOMED",
-    "Condition", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'S',
-    45176377, "bortezomib 3.5 MG Injection [Velcade]", "63020004901", "NDC",
-    "Drug", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'N',
-    19102219, "bortezomib 3.5 MG Injection [Velcade]", "402244", "RxNorm",
-    "Drug", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'S',
-  )
   persons <- seq_len(numberIndividuals)
   n <- length(persons)
   tables[["person"]] <- dplyr::tibble(
@@ -142,45 +108,6 @@ tidyCdmMock <- function() {
       .data$start_year, .data$year_of_birth, .data$start_year)),
     -"start_year"
   )
-  if ("drug_exposure" %in% names(tables)) {
-    nr <- sample.int(n * 2, 1)
-    tables[["drug_exposure"]] <- dplyr::mutate(
-      addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
-        dplyr::inner_join(
-          dplyr::mutate(dplyr::tibble(person_id = sample(tables$person$person_id,
-            size = nr, TRUE
-          )), id = dplyr::row_number()), tables[["observation_period"]],
-          by = "person_id", relationship = "many-to-many"
-        ),
-        .data$id
-      ), n = 1)), c(
-        "drug_exposure_start_date",
-        "drug_exposure_end_date"
-      )),
-      drug_exposure_id = dplyr::row_number(),
-      drug_concept_id = rep.int(19102219, nr),
-      drug_source_concept_id = rep.int(45176377, nr),
-      drug_type_concept_id = 0L
-    )
-  }
-  if ("condition_occurrence" %in% names(tables)) {
-    nr <- sample.int(n * 2, 1)
-    tables[["condition_occurrence"]] <- dplyr::mutate(
-      addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
-        dplyr::inner_join(
-          dplyr::mutate(dplyr::tibble(person_id = sample(tables$person$person_id,
-            size = nr, TRUE
-          )), id = dplyr::row_number()), tables[["observation_period"]],
-          by = "person_id", relationship = "many-to-many"
-        ),
-        .data$id
-      ), n = 1)), c("condition_start_date", "condition_end_date")),
-      condition_occurrence_id = seq_len(nr),
-      condition_concept_id = rep.int(4133224, nr),
-      condition_source_concept_id = rep.int(35207953, nr),
-      condition_type_concept_id = 0L
-    )
-  }
   tablesToInsert <- names(tables)
   src <- CDMConnector::dbSource(con = con, writeSchema = writeSchema)
   for (tab in names(tables)) {
@@ -195,39 +122,11 @@ tidyCdmMock <- function() {
       table = x, overwrite = TRUE
     ))
   }
-
-  cdm <- tidyCdmFromCon(
+  cdm <- tidyOhdsiRecipies::tidyCdmFromCon(
     con = con,
     cdmSchema = writeSchema,
     writeSchema = writeSchema,
-    cdmName = "tidyMock"
+    cdmName = "testing"
   )
-  return(cdm)
-}
-
-addDate <- function(x, cols) {
-  if (nrow(x) == 0) {
-    x <- dplyr::select(x, "person_id")
-    for (col in cols) {
-      x <- dplyr::mutate(x, `:=`(!!col, as.Date(character())))
-    }
-    return(x)
-  }
-  x <- dplyr::rowwise(dplyr::select(
-    x, "person_id", "observation_period_start_date",
-    "observation_period_end_date"
-  ))
-  for (col in cols) {
-    x <- dplyr::mutate(x, diff = as.integer(difftime(
-      .data$observation_period_end_date,
-      .data$observation_period_start_date
-    )), days = sample.int(.data$diff +
-      1, 1) - 1, `:=`(!!col, .data$observation_period_start_date +
-      .data$days), observation_period_start_date = .data[[col]])
-  }
-  x <- dplyr::select(
-    dplyr::ungroup(x), -"observation_period_start_date",
-    -"observation_period_end_date", -"diff", -"days"
-  )
-  return(x)
-}
+  testthat::expect_s3_class(cdm, "cdm_reference")
+})

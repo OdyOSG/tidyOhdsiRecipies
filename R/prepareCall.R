@@ -18,7 +18,7 @@
 #' }
 prepareCall <- function(fn_name, args) {
   rlang::call2(
-    eval(str2lang(fn_name)), !!!purrr::keep(
+    eval(str2lang(fn_name)), !!!purrr::keep_at(
       args, names(args) %in%
         rlang::fn_fmls_names(
           eval(str2lang(fn_name))
