@@ -2,7 +2,7 @@
 #'
 #' This function retrieves concept IDs from a given list of concept codes and vocabularies.
 #'
-#' @param cdm A cdm interface.
+#' @param cdm cdm_reference via CDMConnector.
 #' @param listCodes A vector of concept codes.
 #' @param vocabularyIds A vector of vocabularies. Default is 'ICD10CM'.
 #'
@@ -32,7 +32,7 @@ conceptIdsFromSources <- function(
 #'
 #' This function retrieves standard concept IDs that map to given source concept IDs.
 #'
-#' @param cdm A cdm interface.
+#' @param cdm cdm_reference via CDMConnector
 #' @param sourceConceptIds A vector of source concept IDs.
 #'
 #' @return A vector of standard concept IDs.

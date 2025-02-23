@@ -7,7 +7,7 @@
 conceptIdsFromSources(cdm, listCodes, vocabularyIds = c("ICD10CM"))
 }
 \arguments{
-\item{cdm}{A cdm interface.}
+\item{cdm}{cdm_reference via CDMConnector.}
 
 \item{listCodes}{A vector of concept codes.}
 

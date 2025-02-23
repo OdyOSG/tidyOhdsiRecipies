@@ -7,7 +7,7 @@
 standardFromSourceConceptIds(cdm, sourceConceptIds)
 }
 \arguments{
-\item{cdm}{A cdm interface.}
+\item{cdm}{cdm_reference via CDMConnector}
 
 \item{sourceConceptIds}{A vector of source concept IDs.}
 }
