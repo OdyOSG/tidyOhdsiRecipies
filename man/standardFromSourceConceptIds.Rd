@@ -19,6 +19,6 @@ This function retrieves standard concept IDs that map to given source concept ID
 }
 \examples{
 \dontrun{
-  standardConcepts <- standardFromSourceConceptIds(cdm, c(123456, 789012))
+standardConcepts <- standardFromSourceConceptIds(cdm, c(123456, 789012))
 }
 }

@@ -17,6 +17,6 @@ This function adds a dot in ICD10 codes at the appropriate position.
 }
 \examples{
 \dontrun{
-  icd10_with_dot <- addDot("A001")
+icd10_with_dot <- addDot("A001")
 }
 }

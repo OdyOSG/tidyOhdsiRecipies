@@ -26,13 +26,12 @@
 #'
 #' @examples
 #' \dontrun{
-#'   caprCs <- getCaprCsDetails(
-#'     Capr::cs(list(123456, 789012), name = "Example Concept Set"), cdm
-#'   )
+#' caprCs <- getCaprCsDetails(
+#'   Capr::cs(list(123456, 789012), name = "Example Concept Set"), cdm
+#' )
 #'
-#'   coh <- createCaprConceptSetCohort(caprCs)
+#' coh <- createCaprConceptSetCohort(caprCs)
 #' }
-
 createCaprConceptSetCohort <- function(
     conceptSet,
     limit = "first",
@@ -47,7 +46,6 @@ createCaprConceptSetCohort <- function(
       offsetDays = 7
     ),
     addSourceCriteria = FALSE) {
-
   limit <- snakecase::to_any_case(
     checkmate::matchArg(limit, c("first", "all", "last")),
     case = "title"
@@ -63,16 +61,17 @@ createCaprConceptSetCohort <- function(
   .exit <- gsub(
     "_period_end_date", "_exit",
     checkmate::matchArg(
-    end,
-    c(
-      "observation_period_end_date",
-      "drug_exit",
-      "event_end_date"
+      end,
+      c(
+        "observation_period_end_date",
+        "drug_exit",
+        "event_end_date"
+      )
     )
-  ))
+  )
   .exit <- SqlRender::snakeCaseToCamelCase(
     gsub("event_end_date", "fixed_exit", .exit)
-    )
+  )
 
   fnsCalls <- map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}")) |>
     map(~ prepareCall(.x, list(conceptSet = conceptSet)))
@@ -109,7 +108,7 @@ createCaprConceptSetCohort <- function(
 
 capr_ref <- function(domain_id) {
   entry <- dplyr::tribble(
-    ~ domain_id, ~ capr_spec,
+    ~domain_id, ~capr_spec,
     "condition", "conditionOccurrence",
     "drug", "drugExposure",
     "procedure", "procedureOccurrence",

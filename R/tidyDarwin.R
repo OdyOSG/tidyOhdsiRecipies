@@ -1,4 +1,4 @@
-#' Tidy CDM Data
+#' Tidy CDM Reference From DBI Con
 #'
 #' This function collects and tidies OMOP CDM tables from a given database connection and schema.
 #'
@@ -20,7 +20,7 @@
 #' cohortTables <- c("cohort1", "cohort2")
 #' cdm <- tidyCdm(con, cdmSchema, writeSchema, cohortTables)
 #' }
-tidyCdm <- function(
+tidyCdmFromCon <- function(
     con,
     cdmSchema,
     writeSchema,
@@ -36,7 +36,7 @@ tidyCdm <- function(
   omop_tables <- omopgenerics::omopTables()
   omop_tables <- omop_tables[which(omop_tables %in% tolower(dbTables))]
   cdm_tables_in_db <- dbTables[which(tolower(dbTables) %in%
-                                       omop_tables)]
+    omop_tables)]
   cdmTables <- map(omop_tables, ~ dplyr::tbl(
     src = src,
     schema = cdmSchema,
@@ -48,7 +48,8 @@ tidyCdm <- function(
   )
   attr(cdm, "temp_emulation_prefix") <- paste0(
     "temp", Sys.getpid() +
-      stats::rpois(1, as.integer(Sys.time())) %% 1e+06, "_")
+      stats::rpois(1, as.integer(Sys.time())) %% 1e+06, "_"
+  )
   write_schema_tables <- CDMConnector::listTables(con, schema = writeSchema)
   for (cohort_table in cohortTables) {
     nms <- paste0(cohort_table, c(
@@ -92,17 +93,18 @@ tidyCdm <- function(
 
 
 
-tidyNew <- function (
+tidyNew <- function(
     tables,
     cdmName) {
   constructCdmReference <- getFromNamespace(
     "constructCdmReference", "omopgenerics"
-    )
+  )
   cdm <- constructCdmReference(
     tables = tables,
     cdmName = cdmName,
-    cdmVersion = '5.3',
-    cdmSource = omopgenerics::tableSource(tables[[1]]))
+    cdmVersion = "5.3",
+    cdmSource = omopgenerics::tableSource(tables[[1]])
+  )
   cdm <- .validate(cdm)
   return(cdm)
 }
@@ -135,19 +137,18 @@ tidyNew <- function (
 tidyGenerate <- function(
     cdm,
     cohortSet,
-    name
-) {
-  computeAttrition = TRUE
-  overwrite = TRUE
+    name) {
+  computeAttrition <- TRUE
+  overwrite <- TRUE
   con <- CDMConnector::cdmCon(cdm)
   write_schema <- CDMConnector::cdmWriteSchema(cdm)
   prefix <- ""
   if ("cohortId" %in% names(cohortSet) && !("cohort_definition_id" %in%
-                                            names(cohortSet))) {
+    names(cohortSet))) {
     cohortSet$cohort_definition_id <- cohortSet$cohortId
   }
   if ("cohortName" %in% names(cohortSet) && !("cohort_name" %in%
-                                              names(cohortSet))) {
+    names(cohortSet))) {
     cohortSet$cohort_name <- cohortSet$cohortName
   }
   if (!("cohort" %in% names(cohortSet)) && ("json" %in% names(cohortSet))) {
@@ -215,7 +216,7 @@ tidyGenerate <- function(
   generate <- function(i) {
     pct <- ""
     cli::cli_progress_step("Generating cohort ({i}/{nrow(cohortSet)}{pct}) - {cohortSet$cohort_name[i]}",
-                           spinner = interactive()
+      spinner = interactive()
     )
     sql <- cohortSet$sql[i] %>% SqlRender::render(
       cdm_database_schema = cdm_schema_sql,
@@ -277,8 +278,8 @@ tidyGenerate <- function(
     )
     if (dbms(con) != "spark" && dbms(con) != "bigquery") {
       sql <- SqlRender::translate(sql,
-                                  targetDialect = CDMConnector::dbms(con),
-                                  tempEmulationSchema = "SQL ERROR"
+        targetDialect = CDMConnector::dbms(con),
+        tempEmulationSchema = "SQL ERROR"
       )
       if (stringr::str_detect(sql, "SQL ERROR")) {
         cli::cli_abort("sqlRenderTempEmulationSchema being used for cohort generation!\n        Please open a github issue at {.url https://github.com/darwin-eu/CDMConnector/issues} with your cohort definition.")
@@ -292,8 +293,8 @@ tidyGenerate <- function(
         s <- unname(write_schema[2])
       }
       sql <- SqlRender::translate(sql,
-                                  targetDialect = CDMConnector::dbms(con),
-                                  tempEmulationSchema = s
+        targetDialect = CDMConnector::dbms(con),
+        tempEmulationSchema = s
       )
     }
     if (dbms(con) == "duckdb") {
@@ -317,7 +318,7 @@ tidyGenerate <- function(
       stringr::str_trim() %>%
       stringr::str_c(";") %>%
       stringr::str_subset("^;$",
-                          negate = TRUE
+        negate = TRUE
       )
     drop_statements <- c(
       stringr::str_subset(sql, "DROP TABLE") %>%
@@ -335,7 +336,7 @@ tidyGenerate <- function(
         next
       }
       suppressMessages(DBI::dbExecute(con, drop_statements[k],
-                                      immediate = TRUE
+        immediate = TRUE
       ))
     }
     sql <- stringr::str_replace_all(
@@ -357,7 +358,7 @@ tidyGenerate <- function(
     generate(i)
   }
   cohort_ref <- dplyr::tbl(con, .inSchema(write_schema, name,
-                                                         dbms = dbms(con)
+    dbms = dbms(con)
   ))
   if (computeAttrition) {
     cohort_attrition_ref <- dplyr::collect(
@@ -366,18 +367,19 @@ tidyGenerate <- function(
         cohortStem = name,
         cohortSet = cohortSet,
         overwrite = overwrite
-      ))
+      )
+    )
   } else {
     cohort_attrition_ref <- NULL
   }
   cdm[[name]] <-
     omopgenerics::newCdmTable(cohort_ref, src = attr(
-    cdm,
-    "cdm_source"
-  ), name = name)
+      cdm,
+      "cdm_source"
+    ), name = name)
   cohortSetRef <- dplyr::transmute(cohortSet,
-                                   cohort_definition_id = as.integer(.data$cohort_definition_id),
-                                   cohort_name = as.character(.data$cohort_name)
+    cohort_definition_id = as.integer(.data$cohort_definition_id),
+    cohort_name = as.character(.data$cohort_name)
   )
   cdm[[name]] <- tidyNewCohortTable(
     table = cdm[[name]],
@@ -388,12 +390,11 @@ tidyGenerate <- function(
   return(cdm)
 }
 
-tidyNewCohortTable <- function (
+tidyNewCohortTable <- function(
     table,
     cohortAttritionRef,
     cohortSetRef = attr(table, "cohort_set"),
-    cohortCodelistRef = attr(table, "cohort_codelist"))
-{
+    cohortCodelistRef = attr(table, "cohort_codelist")) {
   if (!is.null(cohortSetRef)) {
     cohortSetRef <- dplyr::as_tibble(cohortSetRef)
   }
@@ -409,11 +410,15 @@ tidyNewCohortTable <- function (
   attr(table, "cohort_codelist") <- NULL
 
   cohortSetRef <- populateCohortSet(table, cohortSetRef)
-  cohortAttritionRef <- populateCohortAttrition(table, cohortSetRef,
-                                                               cohortAttritionRef)
+  cohortAttritionRef <- populateCohortAttrition(
+    table, cohortSetRef,
+    cohortAttritionRef
+  )
   cohortCodelistRef <- populateCohortCodelist(table, cohortCodelistRef)
-  cohort <- constructGeneratedCohortSet(table = table, cohortSetRef = cohortSetRef,
-                                                       cohortAttritionRef = cohortAttritionRef, cohortCodelistRef = cohortCodelistRef)
+  cohort <- constructGeneratedCohortSet(
+    table = table, cohortSetRef = cohortSetRef,
+    cohortAttritionRef = cohortAttritionRef, cohortCodelistRef = cohortCodelistRef
+  )
   return(cohort)
 }
 
@@ -436,7 +441,7 @@ populateCohortSet <- getFromNamespace(
 populateCohortAttrition <- getFromNamespace(
   "populateCohortAttrition", "omopgenerics"
 )
-.validate <- function(cdm, version) {
+.validate <- function(cdm, version = '5.3') {
   xNames <- names(cdm)
   x <- xNames[xNames != tolower(xNames)]
   omopTables <- omopgenerics::omopTables()
@@ -445,14 +450,16 @@ populateCohortAttrition <- getFromNamespace(
     if (nm %in% c("person", "observation_period")) {
       cdm[[nm]] <- omopgenerics::newOmopTable(
         cdm[[nm]],
-        version = version)
-    }
-    else {
+        version = version
+      )
+    } else {
       cdm[[nm]] <- tryCatch(expr = {
         omopgenerics::newOmopTable(cdm[[nm]], version = version)
       }, error = function(e) {
-        cli::cli_warn(c("{nm} table not included in cdm because:",
-                        as.character(e)))
+        cli::cli_warn(c(
+          "{nm} table not included in cdm because:",
+          as.character(e)
+        ))
         return(NULL)
       })
     }

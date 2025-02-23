@@ -17,7 +17,7 @@ This function collects concept sets from a given cohort donor and returns a name
 }
 \examples{
 \dontrun{
-cohortDonor <- jsonlite::read_json('inst/cohorts/ToGet/Male.json')
+cohortDonor <- jsonlite::read_json("inst/cohorts/ToGet/Male.json")
 caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
 }
 }

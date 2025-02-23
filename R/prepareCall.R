@@ -10,11 +10,11 @@
 #'
 #' @examples
 #' \dontrun{
-#'   con <- eval(prepareCall(
-#'     "DatabaseConnector::connect", list(
-#'       connectionDetails = connectionDetails
-#'     )
-#'   ))
+#' con <- eval(prepareCall(
+#'   "DatabaseConnector::connect", list(
+#'     connectionDetails = connectionDetails
+#'   )
+#' ))
 #' }
 prepareCall <- function(fn_name, args) {
   rlang::call2(

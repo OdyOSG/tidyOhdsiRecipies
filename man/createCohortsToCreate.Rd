@@ -21,20 +21,20 @@ This function creates a tibble for the \code{CohortGenerator} package from cohor
 }
 \examples{
 \dontrun{
-  ff <- list.files("inst/concept_sets",
-    pattern = "cs_",
-    full.names = TRUE
-  )
-  conceptSetList <- map(ff, ~ Capr::readConceptSet(
-    .x,
-    name = fs::path_file(.x) |>
-      fs::path_ext_remove()
-  ))
+ff <- list.files("inst/concept_sets",
+  pattern = "cs_",
+  full.names = TRUE
+)
+conceptSetList <- map(ff, ~ Capr::readConceptSet(
+  .x,
+  name = fs::path_file(.x) |>
+    fs::path_ext_remove()
+))
 
-  cohorts <- map(conceptSetList, ~ createCaprCohort(.x)) |>
-    rlang::set_names(
-      ff |> fs::path_file() |>
-        fs::path_ext_remove()
-    )
+cohorts <- map(conceptSetList, ~ createCaprCohort(.x)) |>
+  rlang::set_names(
+    ff |> fs::path_file() |>
+      fs::path_ext_remove()
+  )
 }
 }

@@ -9,16 +9,18 @@
 #'
 #' @examples
 #' \dontrun{
-#' cohortDonor <- jsonlite::read_json('inst/cohorts/ToGet/Male.json')
+#' cohortDonor <- jsonlite::read_json("inst/cohorts/ToGet/Male.json")
 #' caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
 #' }
 collectCaprCsFromCohort <- function(cohortDonor) {
   .all_cs <- map(
-    cohortDonor$ConceptSets, ~ pluck(.x, 'expression'))
+    cohortDonor$ConceptSets, ~ pluck(.x, "expression")
+  )
   .nms <- map_chr(
     cohortDonor$ConceptSets,
-    ~ gsub("[^[:alnum:] ]", "", pluck(.x, 'name')) |>
-      snakecase::to_lower_camel_case())
+    ~ gsub("[^[:alnum:] ]", "", pluck(.x, "name")) |>
+      snakecase::to_lower_camel_case()
+  )
   caprLst <- map2(.all_cs, .nms, .getNewConceptList) |>
     rlang::set_names(.nms)
   return(caprLst)
@@ -28,20 +30,20 @@ collectCaprCsFromCohort <- function(cohortDonor) {
 .getNewConceptList <- function(.expression, .nm) {
   expression <- list()
   expression$items <- .removeItemDuplicates(
-    pluck(.expression, 'items')
+    pluck(.expression, "items")
   )
   newConcept <- getFromNamespace("newConcept", "Capr")
   conceptList <- map(expression$items, ~ newConcept(
     id = .x$concept$CONCEPT_ID,
-    isExcluded = pluck(.x, 'isExcluded', .default = FALSE),
-    includeDescendants = pluck(.x, 'includeDescendants', .default = FALSE),
-    includeMapped = pluck(.x, 'includeMapped', .default = FALSE),
+    isExcluded = pluck(.x, "isExcluded", .default = FALSE),
+    includeDescendants = pluck(.x, "includeDescendants", .default = FALSE),
+    includeMapped = pluck(.x, "includeMapped", .default = FALSE),
     conceptName = .x$concept$CONCEPT_NAME, standardConcept = .x$concept$STANDARD_CONCEPT,
     standardConceptCaption = .x$concept$STANDARD_CONCEPT_CAPTION,
     invalidReason = .x$concept$INVALID_REASON, conceptCode = .x$concept$CONCEPT_CODE,
     domainId = .x$concept$DOMAIN_ID, vocabularyId = .x$concept$VOCABULARY_ID,
-    conceptClassId = .x$concept$CONCEPT_CLASS_ID)
-  )
+    conceptClassId = .x$concept$CONCEPT_CLASS_ID
+  ))
   rlang::inject(Capr::cs(!!!conceptList, name = .nm))
 }
 
@@ -57,4 +59,3 @@ collectCaprCsFromCohort <- function(cohortDonor) {
   }
   return(uniqueItems)
 }
-

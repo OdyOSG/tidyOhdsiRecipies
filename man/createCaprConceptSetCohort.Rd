@@ -47,10 +47,10 @@ This function creates a cohort based on a Capr concept set with detailed informa
 }
 \examples{
 \dontrun{
-  caprCs <- getCaprCsDetails(
-    Capr::cs(list(123456, 789012), name = "Example Concept Set"), cdm
-  )
+caprCs <- getCaprCsDetails(
+  Capr::cs(list(123456, 789012), name = "Example Concept Set"), cdm
+)
 
-  coh <- createCaprConceptSetCohort(caprCs)
+coh <- createCaprConceptSetCohort(caprCs)
 }
 }

@@ -19,10 +19,10 @@ This function prepares a call for a specified function with the given arguments.
 }
 \examples{
 \dontrun{
-  con <- eval(prepareCall(
-    "DatabaseConnector::connect", list(
-      connectionDetails = connectionDetails
-    )
-  ))
+con <- eval(prepareCall(
+  "DatabaseConnector::connect", list(
+    connectionDetails = connectionDetails
+  )
+))
 }
 }

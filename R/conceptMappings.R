@@ -11,15 +11,15 @@
 #'
 #' @examples
 #' \dontrun{
-#'   conceptIds <- conceptIdsFromSources(cdm, c("A01", "B02"), c("ICD10CM"))
+#' conceptIds <- conceptIdsFromSources(cdm, c("A01", "B02"), c("ICD10CM"))
 #' }
 conceptIdsFromSources <- function(
     cdm,
     listCodes,
-    vocabularyIds = c('ICD10CM')) {
+    vocabularyIds = c("ICD10CM")) {
   prepCodes <- tolower(listCodes)
   prepVocab <- tolower(vocabularyIds)
-  res <- cdm[['concept']] |>
+  res <- cdm[["concept"]] |>
     dplyr::filter(tolower(.data$vocabulary_id) %in% prepVocab) |>
     dplyr::filter(tolower(.data$concept_code) %in% prepCodes) |>
     dplyr::select(.data$concept_id) |>
@@ -40,14 +40,15 @@ conceptIdsFromSources <- function(
 #'
 #' @examples
 #' \dontrun{
-#'   standardConcepts <- standardFromSourceConceptIds(cdm, c(123456, 789012))
+#' standardConcepts <- standardFromSourceConceptIds(cdm, c(123456, 789012))
 #' }
 standardFromSourceConceptIds <- function(
     cdm, sourceConceptIds) {
   standardConcepts <- cdm[["concept_relationship"]] |>
     dplyr::filter(.data$concept_id_1 %in% sourceConceptIds &
-                    .data$relationship_id == 'Maps to') |>
-    dplyr::select(.data$concept_id_2) |> dplyr::distinct() |>
+      .data$relationship_id == "Maps to") |>
+    dplyr::select(.data$concept_id_2) |>
+    dplyr::distinct() |>
     dplyr::pull(.data$concept_id_2)
   return(standardConcepts)
 }
@@ -63,7 +64,7 @@ standardFromSourceConceptIds <- function(
 #'
 #' @examples
 #' \dontrun{
-#'   icd10_with_dot <- addDot("A001")
+#' icd10_with_dot <- addDot("A001")
 #' }
 addDot <- function(input_string) {
   if (nchar(input_string) >= 4) {

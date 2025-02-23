@@ -10,6 +10,7 @@
 #' @importFrom rlang !!
 #' @importFrom rlang !!!
 #' @importFrom rlang .data
+#' @importFrom rlang :=
 #' @importFrom utils getFromNamespace
 ## usethis namespace: end
 NULL

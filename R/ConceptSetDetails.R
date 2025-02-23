@@ -10,14 +10,14 @@
 #'
 #' @examples
 #' \dontrun{
-#'   # Example with a vector of concept IDs
-#'   concept_ids <- c(123456, 789012)
-#'   cdm <- CDMConnector::cdmFromCon(con, 'cdm_schema', 'work_schema')
-#'   detailed_concept_set <- getCaprCsDetails(concept_ids, cdm)
+#' # Example with a vector of concept IDs
+#' concept_ids <- c(123456, 789012)
+#' cdm <- CDMConnector::cdmFromCon(con, "cdm_schema", "work_schema")
+#' detailed_concept_set <- getCaprCsDetails(concept_ids, cdm)
 #'
-#'   # Example with a Capr concept set
-#'   capr_concept_set <- Capr::cs(concept_ids, name = "Example Concept Set")
-#'   detailed_concept_set <- getCaprCsDetails(capr_concept_set, cdm)
+#' # Example with a Capr concept set
+#' capr_concept_set <- Capr::cs(concept_ids, name = "Example Concept Set")
+#' detailed_concept_set <- getCaprCsDetails(capr_concept_set, cdm)
 #' }
 getCaprCsDetails <- function(x, cdm) {
   if (!methods::is(x, "ConceptSet")) {
