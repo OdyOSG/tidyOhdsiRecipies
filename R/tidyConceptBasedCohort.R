@@ -53,24 +53,26 @@ createCaprConceptSetCohort <- function(
     case = "title"
   )
 
-  domains <- purrr::pluck(
+  domains <- pluck(
     conceptSet, "Expression"
   ) |>
     map_chr(~ .x@Concept@domain_id) |>
     unique() |>
     tolower()
 
-  .exit <- checkmate::matchArg(
+  .exit <- gsub(
+    "_period_end_date", "_exit",
+    checkmate::matchArg(
     end,
     c(
       "observation_period_end_date",
       "drug_exit",
       "event_end_date"
     )
-  ) %>%
-    gsub("_period_end_date", "_exit", .) %>%
-    gsub("event_end_date", "fixed_exit", .) |>
-    SqlRender::snakeCaseToCamelCase()
+  ))
+  .exit <- SqlRender::snakeCaseToCamelCase(
+    gsub("event_end_date", "fixed_exit", .exit)
+    )
 
   fnsCalls <- map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}")) |>
     map(~ prepareCall(.x, list(conceptSet = conceptSet)))
@@ -107,7 +109,7 @@ createCaprConceptSetCohort <- function(
 
 capr_ref <- function(domain_id) {
   entry <- dplyr::tribble(
-    ~domain_id, ~capr_spec,
+    ~ domain_id, ~ capr_spec,
     "condition", "conditionOccurrence",
     "drug", "drugExposure",
     "procedure", "procedureOccurrence",
@@ -161,5 +163,3 @@ split_on_second_uppercase <- function(string) {
 
   return(c(part1))
 }
-
-utils::globalVariables(c("."))

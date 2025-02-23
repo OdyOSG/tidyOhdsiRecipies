@@ -22,7 +22,7 @@ Imports:
     methods,
     purrr,
     readr,
-    snakecase,
+    snakecase (>= 0.11.1),
     stringr,
     tibble,
     glue,

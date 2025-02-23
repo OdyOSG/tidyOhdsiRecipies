@@ -2,7 +2,10 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @import rlang
+#' @importFrom rlang !!
+#' @importFrom rlang !!!
+#' @importFrom rlang .data
+#' @import purrr
 #' @importFrom glue glue
 #' @importFrom lifecycle deprecated
 ## usethis namespace: end

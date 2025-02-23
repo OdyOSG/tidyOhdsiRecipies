@@ -23,8 +23,8 @@ conceptIdsFromSources <- function(
     dplyr::filter(tolower(.data$vocabulary_id) %in% prepVocab) |>
     dplyr::filter(tolower(.data$concept_code) %in% prepCodes) |>
     dplyr::select(.data$concept_id) |>
-    dplyr::distinct() |>
-    dplyr::pull()
+    dplyr::distinct(.data) |>
+    dplyr::pull(.data)
   return(res)
 }
 

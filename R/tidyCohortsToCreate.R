@@ -49,7 +49,7 @@ createCohortsToCreate <- function(
     ) |>
       dplyr::mutate(
         sql = map_chr(
-          json, ~ CirceR::buildCohortQuery(
+          .data$json, ~ CirceR::buildCohortQuery(
             CirceR::cohortExpressionFromJson(.x),
             CirceR::createGenerateOptions(generateStats = computeAttrition)
           )
@@ -95,7 +95,4 @@ writeListCohort <- function(cohort, path) {
   write(as.character(RJSONIO::toJSON(cohort, pretty = TRUE)), path)
   invisible(NULL)
 }
-
-utils::globalVariables(c("json"))
-
 

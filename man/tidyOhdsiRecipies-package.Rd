@@ -8,6 +8,14 @@
 \description{
 This package provides a set of methods for working with OHDSI (Observational Health Data Sciences and Informatics) tools, offering convenient functions for data analysis and processing.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/OdyOSG/tidyOhdsiRecipies}
+  \item Report bugs at \url{https://github.com/OdyOSG/tidyOhdsiRecipies/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Alexander Alexeyuk \email{AlexanderAlexeyuk@gmail.com}
 

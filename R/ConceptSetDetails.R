@@ -12,7 +12,7 @@
 #' \dontrun{
 #'   # Example with a vector of concept IDs
 #'   concept_ids <- c(123456, 789012)
-#'   cdm <- CDMConnector::cdmFromCon(con, 'cdm_schema', 'work_schema') # Hypothetical function to connect to CDM
+#'   cdm <- CDMConnector::cdmFromCon(con, 'cdm_schema', 'work_schema')
 #'   detailed_concept_set <- getCaprCsDetails(concept_ids, cdm)
 #'
 #'   # Example with a Capr concept set
@@ -27,8 +27,8 @@ getCaprCsDetails <- function(x, cdm) {
   ids <- map_int(x@Expression, ~ .@Concept@concept_id)
   df <- cdm[["concept"]] %>%
     dplyr::filter(.data$concept_id %in% ids) %>%
-    dplyr::collect() %>%
-    tibble::tibble() %>%
+    dplyr::collect(.data) %>%
+    tibble::tibble(.data) %>%
     dplyr::mutate(
       invalid_reason = ifelse(is.na(.data$invalid_reason), "V", .data$invalid_reason)
     ) %>%
