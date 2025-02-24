@@ -1,4 +1,3 @@
-
 # tidyOhdsiRecipies <img src="man/figures/logo.jpg" align="right" height="92" alt="" />
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -6,6 +5,7 @@
 # tidyOhdsiRecipies
 
 <!-- badges: start -->
+
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
@@ -14,45 +14,25 @@ status](https://www.r-pkg.org/badges/version/tidyOhdsiRecipies)](https://CRAN.R-
 coverage](https://codecov.io/gh/OdyOSG/tidyOhdsiRecipies/graph/badge.svg)](https://app.codecov.io/gh/OdyOSG/tidyOhdsiRecipies)
 <!-- badges: end -->
 
-The goal of tidyOhdsiRecipies is to …
+The goal of tidyOhdsiRecipies is to simplify and automate routine tasks
+when working with the Observational Medical Outcomes Partnership (OMOP)
+Common Data Model (CDM). This package provides a set of tools and
+functions to help researchers and analysts effectively manage, analyze
+and modify data that complies with the OMOP CDM standard.
 
 ## Installation
 
 You can install the development version of tidyOhdsiRecipies like so:
 
-``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
-```
+    remotes::install_github('OdyOSG/tidyOhdsiRecipies')
 
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
 
-``` r
-library(tidyOhdsiRecipies)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
-
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+    library(tidyOhdsiRecipies)
+    # create cohortsToCreate for `CohortGenerator` package 
+    cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(
+      path = 'inst/cohorts',
+      computeAttrition = TRUE
+    )
