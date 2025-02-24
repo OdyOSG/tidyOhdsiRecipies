@@ -37,7 +37,7 @@ tidyCdmFromCon <- function(
   omop_tables <- omop_tables[which(omop_tables %in% tolower(dbTables))]
   cdm_tables_in_db <- dbTables[which(tolower(dbTables) %in%
     omop_tables)]
-  cdmTables <- map(omop_tables, ~ dplyr::tbl(
+  cdmTables <- purrr::map(omop_tables, ~ dplyr::tbl(
     src = src,
     schema = cdmSchema,
     name = .x
@@ -56,7 +56,7 @@ tidyCdmFromCon <- function(
       "", "_set", "_attrition",
       "_codelist"
     ))
-    x <- map(nms, function(nm) {
+    x <- purrr::map(nms, function(nm) {
       if (nm %in% write_schema_tables) {
         dplyr::tbl(
           src = src,
@@ -314,19 +314,19 @@ tidyGenerate <- function(
       )
     }
     sql <- stringr::str_replace_all(sql, "\\s+", " ")
-    sql <- stringr::str_split(sql, ";")[[1]] %>%
-      stringr::str_trim() %>%
-      stringr::str_c(";") %>%
+    sql <- stringr::str_split(sql, ";")[[1]] |>
+      stringr::str_trim() |>
+      stringr::str_c(";") |>
       stringr::str_subset("^;$",
         negate = TRUE
       )
     drop_statements <- c(
-      stringr::str_subset(sql, "DROP TABLE") %>%
-        stringr::str_subset("IF EXISTS", negate = TRUE) %>%
+      stringr::str_subset(sql, "DROP TABLE") |>
+        stringr::str_subset("IF EXISTS", negate = TRUE) |>
         stringr::str_replace("DROP TABLE", "DROP TABLE IF EXISTS"),
       stringr::str_subset(sql, "DROP TABLE IF EXISTS")
-    ) %>%
-      map_chr(~ SqlRender::translate(., dbms(con)))
+    ) |>
+      purrr::map_chr(~ SqlRender::translate(.x, dbms(con)))
     drop_statements <- stringr::str_replace_all(
       drop_statements,
       "--([^\n])*?\n", "\n"
@@ -441,7 +441,7 @@ populateCohortSet <- getFromNamespace(
 populateCohortAttrition <- getFromNamespace(
   "populateCohortAttrition", "omopgenerics"
 )
-.validate <- function(cdm, version = '5.3') {
+.validate <- function(cdm, version = "5.3") {
   xNames <- names(cdm)
   x <- xNames[xNames != tolower(xNames)]
   omopTables <- omopgenerics::omopTables()

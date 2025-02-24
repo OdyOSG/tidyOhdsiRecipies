@@ -21,6 +21,7 @@ This function retrieves concept IDs from a given list of concept codes and vocab
 }
 \examples{
 \dontrun{
-conceptIds <- conceptIdsFromSources(cdm, c("A01", "B02"), c("ICD10CM"))
+cdm <- tidyOhdsiRecipies::tidyCdmMock()
+conceptIds <- conceptIdsFromSources(cdm, c("63020004901"), c("NDC"))
 }
 }

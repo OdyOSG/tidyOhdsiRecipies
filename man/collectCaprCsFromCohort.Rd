@@ -13,11 +13,14 @@ collectCaprCsFromCohort(cohortDonor)
 A named list of concept sets.
 }
 \description{
-This function collects concept sets from a given cohort donor and returns a named list.
+This function collects concept sets from a given cohort donor and returns a named list of collection
+Capr ConceptSet s4 class.
 }
 \examples{
 \dontrun{
-cohortDonor <- jsonlite::read_json("inst/cohorts/ToGet/Male.json")
+cohortDonor <- jsonlite::read_json(fs::path(
+fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
+))
 caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
 }
 }

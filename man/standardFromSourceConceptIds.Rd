@@ -19,6 +19,8 @@ This function retrieves standard concept IDs that map to given source concept ID
 }
 \examples{
 \dontrun{
-standardConcepts <- standardFromSourceConceptIds(cdm, c(123456, 789012))
+cdm <- tidyOhdsiRecipies::tidyCdmMock()
+conceptIds <- conceptIdsFromSources(cdm, c("63020004901"), c("NDC"))
+standardConcepts <- standardFromSourceConceptIds(cdm, conceptIds)
 }
 }

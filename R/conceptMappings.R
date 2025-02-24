@@ -11,7 +11,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' conceptIds <- conceptIdsFromSources(cdm, c("A01", "B02"), c("ICD10CM"))
+#' cdm <- tidyOhdsiRecipies::tidyCdmMock()
+#' conceptIds <- conceptIdsFromSources(cdm, c("63020004901"), c("NDC"))
 #' }
 conceptIdsFromSources <- function(
     cdm,
@@ -22,8 +23,7 @@ conceptIdsFromSources <- function(
   res <- cdm[["concept"]] |>
     dplyr::filter(tolower(.data$vocabulary_id) %in% prepVocab) |>
     dplyr::filter(tolower(.data$concept_code) %in% prepCodes) |>
-    dplyr::select(.data$concept_id) |>
-    dplyr::distinct(.data) |>
+    dplyr::distinct(dplyr::select(.data$concept_id)) |>
     dplyr::pull(.data)
   return(res)
 }
@@ -40,7 +40,9 @@ conceptIdsFromSources <- function(
 #'
 #' @examples
 #' \dontrun{
-#' standardConcepts <- standardFromSourceConceptIds(cdm, c(123456, 789012))
+#' cdm <- tidyOhdsiRecipies::tidyCdmMock()
+#' conceptIds <- conceptIdsFromSources(cdm, c("63020004901"), c("NDC"))
+#' standardConcepts <- standardFromSourceConceptIds(cdm, conceptIds)
 #' }
 standardFromSourceConceptIds <- function(
     cdm, sourceConceptIds) {
@@ -68,7 +70,10 @@ standardFromSourceConceptIds <- function(
 #' }
 addDot <- function(input_string) {
   if (nchar(input_string) >= 4) {
-    return(paste0(substr(input_string, 1, 3), ".", substr(input_string, 4, nchar(input_string))))
+    return(paste0(
+      substr(input_string, 1, 3), ".",
+      substr(input_string, 4, nchar(input_string))
+    ))
   } else {
     return(input_string)
   }

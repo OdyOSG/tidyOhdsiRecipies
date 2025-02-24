@@ -2,14 +2,14 @@
 % Please edit documentation in R/ConceptSetDetails.R
 \name{getCaprCsDetails}
 \alias{getCaprCsDetails}
-\title{Get Capr Concept Set Details from CDM}
+\title{Get Capr Concept Set Details from cdm}
 \usage{
 getCaprCsDetails(x, cdm)
 }
 \arguments{
 \item{x}{A list of concept IDs or a Capr concept set (Capr S4 class).}
 
-\item{cdm}{An interface to the CDM, typically a database connection or similar object.}
+\item{cdm}{cdm_reference via CDMConnector.}
 }
 \value{
 A Capr concept set with detailed information populated from the CDM.

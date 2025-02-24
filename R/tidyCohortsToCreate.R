@@ -42,12 +42,12 @@ createCohortsToCreate <- function(
       cohortId = seq_along(jsonFiles),
       cohortName = fs::path_file(jsonFiles) |>
         fs::path_ext_remove(),
-      json = map_chr(
+      json = purrr::map_chr(
         jsonFiles, readr::read_file
       )
     ) |>
       dplyr::mutate(
-        sql = map_chr(
+        sql = purrr::map_chr(
           .data$json, ~ CirceR::buildCohortQuery(
             CirceR::cohortExpressionFromJson(.x),
             CirceR::createGenerateOptions(generateStats = computeAttrition)
@@ -58,12 +58,12 @@ createCohortsToCreate <- function(
     cohortsToCreate <- dplyr::tibble(
       cohortId = seq_along(cohorts),
       cohortName = names(cohorts),
-      json = map_chr(cohorts, ~ as.character(
+      json = purrr::map_chr(cohorts, ~ as.character(
         RJSONIO::toJSON(.x, pretty = TRUE)
       ))
     ) |>
       dplyr::mutate(
-        sql = map_chr(
+        sql = purrr::map_chr(
           .data$json, ~ CirceR::buildCohortQuery(
             CirceR::cohortExpressionFromJson(.x),
             CirceR::createGenerateOptions(generateStats = computeAttrition)

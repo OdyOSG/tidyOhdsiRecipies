@@ -1,6 +1,7 @@
 #' Collect Capr Concept Sets from Cohort
 #'
-#' This function collects concept sets from a given cohort donor and returns a named list.
+#' This function collects concept sets from a given cohort donor and returns a named list of collection
+#' Capr ConceptSet s4 class.
 #'
 #' @param cohortDonor A list containing a cohort donor `jsonlite::read_json` output definition
 #'
@@ -9,20 +10,26 @@
 #'
 #' @examples
 #' \dontrun{
-#' cohortDonor <- jsonlite::read_json("inst/cohorts/ToGet/Male.json")
-#' caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
+#' cohortDonor <- jsonlite::read_json(fs::path(
+#'   fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
+#' ))
+#' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1:2]
+#' cohs <- purrr::map(
+#'   caprConceptSets,
+#'   ~tidyOhdsiRecipies::createCaprConceptSetCohort(.x)
+#' )
 #' }
 collectCaprCsFromCohort <- function(cohortDonor) {
-  .all_cs <- map(
-    cohortDonor$ConceptSets, ~ pluck(.x, "expression")
+  .all_cs <- purrr::map(
+    cohortDonor$ConceptSets, ~ purrr::pluck(.x, "expression")
   )
-  .nms <- map_chr(
+  .nms <- purrr::map_chr(
     cohortDonor$ConceptSets,
-    ~ gsub("[^[:alnum:] ]", "", pluck(.x, "name")) |>
+    ~ gsub("[^[:alnum:] ]", "", purrr::pluck(.x, "name")) |>
       snakecase::to_lower_camel_case()
   )
-  caprLst <- map2(.all_cs, .nms, .getNewConceptList) |>
-    rlang::set_names(.nms)
+  caprLst <- rlang::set_names(purrr::map2(.all_cs, .nms, .getNewConceptList),.nms)
+
   return(caprLst)
 }
 
@@ -30,14 +37,14 @@ collectCaprCsFromCohort <- function(cohortDonor) {
 .getNewConceptList <- function(.expression, .nm) {
   expression <- list()
   expression$items <- .removeItemDuplicates(
-    pluck(.expression, "items")
+    purrr::pluck(.expression, "items")
   )
   newConcept <- getFromNamespace("newConcept", "Capr")
-  conceptList <- map(expression$items, ~ newConcept(
+  conceptList <- purrr::map(expression$items, ~ newConcept(
     id = .x$concept$CONCEPT_ID,
-    isExcluded = pluck(.x, "isExcluded", .default = FALSE),
-    includeDescendants = pluck(.x, "includeDescendants", .default = FALSE),
-    includeMapped = pluck(.x, "includeMapped", .default = FALSE),
+    isExcluded = purrr::pluck(.x, "isExcluded", .default = FALSE),
+    includeDescendants = purrr::pluck(.x, "includeDescendants", .default = FALSE),
+    includeMapped = purrr::pluck(.x, "includeMapped", .default = FALSE),
     conceptName = .x$concept$CONCEPT_NAME, standardConcept = .x$concept$STANDARD_CONCEPT,
     standardConceptCaption = .x$concept$STANDARD_CONCEPT_CAPTION,
     invalidReason = .x$concept$INVALID_REASON, conceptCode = .x$concept$CONCEPT_CODE,

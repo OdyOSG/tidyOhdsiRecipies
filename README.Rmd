@@ -1,6 +1,7 @@
 ---
 output: github_document
 ---
+# tidyOhdsiRecipies <img src="man/figures/logo.jpg" align="right" height="92" alt="" />
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 

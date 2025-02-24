@@ -12,6 +12,7 @@ Suggests:
     jsonlite,
     readr,
     stringi,
+    RSQLite,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
@@ -21,7 +22,7 @@ Imports:
     Capr,
     CirceR,
     RJSONIO,
-    SqlRender,
+    DatabaseConnector,
     checkmate,
     dplyr,
     fs,
@@ -36,6 +37,9 @@ Imports:
     rlang,
     utils,
     omopgenerics (>= 0.4.1),
-    CDMConnector (>= 1.7.0)    
+    CDMConnector (>= 1.7.0),
+    SqlRender
 URL: https://github.com/OdyOSG/tidyOhdsiRecipies
 BugReports: https://github.com/OdyOSG/tidyOhdsiRecipies/issues
+Depends: 
+    R (>= 4.2)

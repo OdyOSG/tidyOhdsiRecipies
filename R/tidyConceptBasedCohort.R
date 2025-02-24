@@ -51,10 +51,10 @@ createCaprConceptSetCohort <- function(
     case = "title"
   )
 
-  domains <- pluck(
+  domains <- purrr::pluck(
     conceptSet, "Expression"
   ) |>
-    map_chr(~ .x@Concept@domain_id) |>
+    purrr::map_chr(~ .x@Concept@domain_id) |>
     unique() |>
     tolower()
 
@@ -73,14 +73,15 @@ createCaprConceptSetCohort <- function(
     gsub("event_end_date", "fixed_exit", .exit)
   )
 
-  fnsCalls <- map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}"))
+  fnsCalls <- purrr::map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}"))
 
   fnsCalls <- purrr::map(
     fnsCalls,
-    ~ prepareCall(.x, args = list(conceptSet = conceptSet)))
+    ~ prepareCall(.x, args = list(conceptSet = conceptSet))
+  )
 
 
-  .evals <- map_chr(
+  .evals <- purrr::map_chr(
     seq_along(fnsCalls),
     ~ glue::glue("eval(fnsCalls[[{.x}]])")
   ) |>
@@ -124,20 +125,18 @@ capr_ref <- function(domain_ids) {
     dplyr::filter(.data$domain_id %in% domain_ids) |>
     dplyr::pull(.data$capr_spec)
 }
-
-
 .addSourceConceptEntry <- function(cohort) {
   domainsN <- length(cohort$PrimaryCriteria$CriteriaList)
-  domainBlocks <- map_chr(
+  domainBlocks <- purrr::map_chr(
     1:domainsN, ~ cohort$PrimaryCriteria$CriteriaList[[.x]] |>
       names() |>
       split_on_second_uppercase()
   )
-  occurrences <- map_chr(
+  occurrences <- purrr::map_chr(
     1:domainsN, ~ cohort$PrimaryCriteria$CriteriaList[[.x]] |>
       names()
   )
-  sourceCriteria <- map_chr(
+  sourceCriteria <- purrr::map_chr(
     1:domainsN, ~ paste0(domainBlocks[[.x]], "SourceConcept")
   )
   for (.N in 1:domainsN) {

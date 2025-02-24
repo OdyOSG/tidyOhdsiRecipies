@@ -32,16 +32,16 @@ tidyCdmMock <- function() {
   tables[["concept"]] <- dplyr::tribble(
     ~concept_id, ~concept_name, ~concept_code, ~vocabulary_id,
     ~domain_id, ~concept_class_id,
-    ~valid_start_date, ~valid_end_date, ~ invalid_reason,
-    ~ standard_concept,
+    ~valid_start_date, ~valid_end_date, ~invalid_reason,
+    ~standard_concept,
     35207953, "Lobar pneumonia, unspecified organism", "J18.1", "ICD10CM",
-    "Condition", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'N',
+    "Condition", "plug", as.Date("2020-01-01"), as.Date("2030-01-01"), "V", "N",
     4133224, "Lobar pneumonia", "278516003", "SNOMED",
-    "Condition", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'S',
+    "Condition", "plug", as.Date("2020-01-01"), as.Date("2030-01-01"), "V", "S",
     45176377, "bortezomib 3.5 MG Injection [Velcade]", "63020004901", "NDC",
-    "Drug", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'N',
+    "Drug", "plug", as.Date("2020-01-01"), as.Date("2030-01-01"), "V", "N",
     19102219, "bortezomib 3.5 MG Injection [Velcade]", "402244", "RxNorm",
-    "Drug", "plug", as.Date("2020-01-01"), as.Date("2020-01-01"), 'V', 'S',
+    "Drug", "plug", as.Date("2020-01-01"), as.Date("2030-01-01"), "V", "S",
   )
   persons <- seq_len(numberIndividuals)
   n <- length(persons)
@@ -76,7 +76,6 @@ tidyCdmMock <- function() {
       }
     }
   }
-  if ("observation_period" %in% names(tables)) {
     if (nrow(dates) == 0) {
       tables[["observation_period"]] <- dplyr::mutate(
         dplyr::select(
@@ -127,7 +126,7 @@ tidyCdmMock <- function() {
       ),
       -"year_of_birth"
     )
-  }
+
   tables[["person"]] <- dplyr::select(
     dplyr::mutate(dplyr::left_join(tables[["person"]],
       dplyr::summarise(dplyr::group_by(
@@ -142,8 +141,7 @@ tidyCdmMock <- function() {
       .data$start_year, .data$year_of_birth, .data$start_year)),
     -"start_year"
   )
-  if ("drug_exposure" %in% names(tables)) {
-    nr <- sample.int(n * 2, 1)
+  nr <- sample.int(n * 2, 1)
     tables[["drug_exposure"]] <- dplyr::mutate(
       addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
         dplyr::inner_join(
@@ -162,8 +160,8 @@ tidyCdmMock <- function() {
       drug_source_concept_id = rep.int(45176377, nr),
       drug_type_concept_id = 0L
     )
-  }
-  if ("condition_occurrence" %in% names(tables)) {
+
+
     nr <- sample.int(n * 2, 1)
     tables[["condition_occurrence"]] <- dplyr::mutate(
       addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
@@ -180,7 +178,8 @@ tidyCdmMock <- function() {
       condition_source_concept_id = rep.int(35207953, nr),
       condition_type_concept_id = 0L
     )
-  }
+
+
   tablesToInsert <- names(tables)
   src <- CDMConnector::dbSource(con = con, writeSchema = writeSchema)
   for (tab in names(tables)) {
@@ -195,7 +194,6 @@ tidyCdmMock <- function() {
       table = x, overwrite = TRUE
     ))
   }
-
   cdm <- tidyCdmFromCon(
     con = con,
     cdmSchema = writeSchema,
@@ -204,6 +202,32 @@ tidyCdmMock <- function() {
   )
   return(cdm)
 }
+
+#' Create Test SQLite Database Connection
+#'
+#' This function creates and returns a connection to a SQLite database using the DatabaseConnector package.
+#'
+#' @return A DatabaseConnector connection object.
+#' @export
+#'
+#' @examples
+#' con <- returnSqLiteDatabaseConnectorCon()
+#' DBI::dbListTables(con)
+#' DatabaseConnector::disconnect(con)
+returnSqLiteDatabaseConnectorCon <- function() {
+  pathToSqlite <- fs::path(
+    fs::path_package("tidyOhdsiRecipies"),
+    "testdata",
+    "test_database.sqlite"
+  )
+  rlang::check_installed("RSQLite")
+  connectionDetails <- DatabaseConnector::createConnectionDetails(
+    dbms = "sqlite", server = pathToSqlite
+  )
+  con <- DatabaseConnector::connect(connectionDetails)
+  return(con)
+}
+
 
 addDate <- function(x, cols) {
   if (nrow(x) == 0) {
