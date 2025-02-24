@@ -23,8 +23,9 @@ conceptIdsFromSources <- function(
   res <- cdm[["concept"]] |>
     dplyr::filter(tolower(.data$vocabulary_id) %in% prepVocab) |>
     dplyr::filter(tolower(.data$concept_code) %in% prepCodes) |>
-    dplyr::distinct(dplyr::select(.data$concept_id)) |>
-    dplyr::pull(.data)
+    dplyr::select(.data$concept_id) |>
+    dplyr::distinct() |>
+    dplyr::pull()
   return(res)
 }
 

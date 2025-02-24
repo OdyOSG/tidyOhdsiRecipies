@@ -194,7 +194,7 @@ tidyGenerate <- function(
   )
   createCohortTables(con, write_schema, name, computeAttrition)
   cdm_schema <- attr(cdm, "cdm_schema")
-  cdm_schema_sql <- glue_sql_collapse(DBI::dbQuoteIdentifier(
+  cdm_schema_sql <- glue::glue_sql_collapse(DBI::dbQuoteIdentifier(
     con,
     cdm_schema
   ), sep = ".")
@@ -218,7 +218,7 @@ tidyGenerate <- function(
     cli::cli_progress_step("Generating cohort ({i}/{nrow(cohortSet)}{pct}) - {cohortSet$cohort_name[i]}",
       spinner = interactive()
     )
-    sql <- cohortSet$sql[i] %>% SqlRender::render(
+    sql <- cohortSet$sql[i] |> SqlRender::render(
       cdm_database_schema = cdm_schema_sql,
       vocabulary_database_schema = cdm_schema_sql, target_database_schema = write_schema_sql,
       results_database_schema.cohort_inclusion = paste0(

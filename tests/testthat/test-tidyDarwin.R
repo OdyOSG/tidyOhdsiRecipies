@@ -130,3 +130,27 @@ test_that("Tidy CDM Referrence test", {
   )
   testthat::expect_s3_class(cdm, "cdm_reference")
 })
+
+test_that("Tidy Generate From CDM", {
+  cdm <- tidyOhdsiRecipies::tidyCdmMock()
+  caprCs1 <- Capr::cs(4133224, name = "lobar pneumonia")
+  csWithDetails <- purrr::map(
+    list(caprCs1), ~
+      tidyOhdsiRecipies::getCaprCsDetails(.x, cdm)
+  )
+  cohortsBasedOnCs <- purrr::map(
+    csWithDetails, ~ tidyOhdsiRecipies::createCaprConceptSetCohort(.x, addSourceCriteria = TRUE)
+  )
+  named_cohort_list <- list(
+    Lobar_pneumonia = cohortsBasedOnCs[[1]]
+  )
+  cohortSet <- tidyOhdsiRecipies::CirceR2CDMConn(named_cohort_list)
+  cdm <- tidyOhdsiRecipies::tidyGenerate(
+    cdm,
+    cohortSet = cohortSet,
+    name = 'test_cohort'
+  )
+  testthat::expect_true(!is.null(cdm$test_cohort))
+  .res <- cdm$test_cohort |> dplyr::collect()
+  testthat::expect_gt(nrow(.res), 0)
+})

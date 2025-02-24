@@ -76,56 +76,43 @@ tidyCdmMock <- function() {
       }
     }
   }
-    if (nrow(dates) == 0) {
-      tables[["observation_period"]] <- dplyr::mutate(
-        dplyr::select(
-          tables[["person"]],
-          "person_id", "year_of_birth"
-        ),
-        observation_period_start_date = as.Date(NA),
-        observation_period_end_date = as.Date(NA)
-      )
-    } else {
-      tables[["observation_period"]] <- dplyr::left_join(dplyr::select(
-        tables[["person"]],
-        "person_id", "year_of_birth"
-      ), dplyr::summarise(dplyr::group_by(
-        dates,
-        .data$person_id
-      ), observation_period_start_date = min(.data$date,
-        na.rm = TRUE
-      ), observation_period_end_date = max(.data$date,
-        na.rm = TRUE
-      )), by = "person_id")
-    }
-    tables[["observation_period"]] <- dplyr::select(
-      dplyr::mutate(tables[["observation_period"]],
-        observation_period_start_date = dplyr::if_else(is.na(.data$observation_period_start_date),
-          as.Date(x = paste0(
-            .data$year_of_birth + sample.int(
-              34,
-              n, TRUE
-            ), "-", sample(1:12, n, TRUE), "-",
-            sample(1:28, n, TRUE)
-          ), format = "%Y-%m-%d"),
-          .data$observation_period_start_date
-        ), observation_period_end_date = dplyr::if_else(is.na(.data$observation_period_end_date),
-          .data$observation_period_start_date + sample.int(
-            10000,
+  tables[["observation_period"]] <- dplyr::mutate(
+    dplyr::select(
+      tables[["person"]],
+      "person_id", "year_of_birth"
+    ),
+    observation_period_start_date = as.Date(NA),
+    observation_period_end_date = as.Date(NA)
+  )
+
+  tables[["observation_period"]] <- dplyr::select(
+    dplyr::mutate(tables[["observation_period"]],
+      observation_period_start_date = dplyr::if_else(is.na(.data$observation_period_start_date),
+        as.Date(x = paste0(
+          .data$year_of_birth + sample.int(
+            34,
             n, TRUE
-          ), .data$observation_period_end_date
-        ),
-        period_type_concept_id = 0L, observation_period_id = dplyr::row_number(),
-        observation_period_start_date = dplyr::if_else(as.integer(format(
-          .data$observation_period_start_date,
-          "%Y"
-        )) >= .data$year_of_birth, as.Date(paste0(
-          .data$year_of_birth,
-          "-01-01"
-        )), .data$observation_period_start_date)
+          ), "-", sample(1:12, n, TRUE), "-",
+          sample(1:28, n, TRUE)
+        ), format = "%Y-%m-%d"),
+        .data$observation_period_start_date
+      ), observation_period_end_date = dplyr::if_else(is.na(.data$observation_period_end_date),
+        .data$observation_period_start_date + sample.int(
+          10000,
+          n, TRUE
+        ), .data$observation_period_end_date
       ),
-      -"year_of_birth"
-    )
+      period_type_concept_id = 0L, observation_period_id = dplyr::row_number(),
+      observation_period_start_date = dplyr::if_else(as.integer(format(
+        .data$observation_period_start_date,
+        "%Y"
+      )) >= .data$year_of_birth, as.Date(paste0(
+        .data$year_of_birth,
+        "-01-01"
+      )), .data$observation_period_start_date)
+    ),
+    -"year_of_birth"
+  )
 
   tables[["person"]] <- dplyr::select(
     dplyr::mutate(dplyr::left_join(tables[["person"]],
@@ -142,42 +129,44 @@ tidyCdmMock <- function() {
     -"start_year"
   )
   nr <- sample.int(n * 2, 1)
-    tables[["drug_exposure"]] <- dplyr::mutate(
-      addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
-        dplyr::inner_join(
-          dplyr::mutate(dplyr::tibble(person_id = sample(tables$person$person_id,
-            size = nr, TRUE
-          )), id = dplyr::row_number()), tables[["observation_period"]],
-          by = "person_id", relationship = "many-to-many"
-        ),
-        .data$id
-      ), n = 1)), c(
-        "drug_exposure_start_date",
-        "drug_exposure_end_date"
-      )),
-      drug_exposure_id = dplyr::row_number(),
-      drug_concept_id = rep.int(19102219, nr),
-      drug_source_concept_id = rep.int(45176377, nr),
-      drug_type_concept_id = 0L
-    )
+  tables[["drug_exposure"]] <- dplyr::mutate(
+    addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
+      dplyr::inner_join(
+        dplyr::mutate(dplyr::tibble(person_id = sample(tables$person$person_id,
+          size = nr, TRUE
+        )), id = dplyr::row_number()), tables[["observation_period"]],
+        by = "person_id", relationship = "many-to-many"
+      ),
+      .data$id
+    ), n = 1)), c(
+      "drug_exposure_start_date",
+      "drug_exposure_end_date"
+    )),
+    drug_exposure_id = dplyr::row_number(),
+    drug_concept_id = rep.int(19102219, nr),
+    drug_source_concept_id = rep.int(45176377, nr),
+    drug_type_concept_id = 0L,
+    visit_occurrence_id = 1:nr
+  )
 
 
-    nr <- sample.int(n * 2, 1)
-    tables[["condition_occurrence"]] <- dplyr::mutate(
-      addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
-        dplyr::inner_join(
-          dplyr::mutate(dplyr::tibble(person_id = sample(tables$person$person_id,
-            size = nr, TRUE
-          )), id = dplyr::row_number()), tables[["observation_period"]],
-          by = "person_id", relationship = "many-to-many"
-        ),
-        .data$id
-      ), n = 1)), c("condition_start_date", "condition_end_date")),
-      condition_occurrence_id = seq_len(nr),
-      condition_concept_id = rep.int(4133224, nr),
-      condition_source_concept_id = rep.int(35207953, nr),
-      condition_type_concept_id = 0L
-    )
+  nr <- sample.int(n * 2, 1)
+  tables[["condition_occurrence"]] <- dplyr::mutate(
+    addDate(dplyr::ungroup(dplyr::slice_sample(dplyr::group_by(
+      dplyr::inner_join(
+        dplyr::mutate(dplyr::tibble(person_id = sample(tables$person$person_id,
+          size = nr, TRUE
+        )), id = dplyr::row_number()), tables[["observation_period"]],
+        by = "person_id", relationship = "many-to-many"
+      ),
+      .data$id
+    ), n = 1)), c("condition_start_date", "condition_end_date")),
+    condition_occurrence_id = seq_len(nr),
+    condition_concept_id = rep.int(4133224, nr),
+    condition_source_concept_id = rep.int(35207953, nr),
+    condition_type_concept_id = 0L,
+    visit_occurrence_id = 1:nr
+  )
 
 
   tablesToInsert <- names(tables)
@@ -230,13 +219,6 @@ returnSqLiteDatabaseConnectorCon <- function() {
 
 
 addDate <- function(x, cols) {
-  if (nrow(x) == 0) {
-    x <- dplyr::select(x, "person_id")
-    for (col in cols) {
-      x <- dplyr::mutate(x, `:=`(!!col, as.Date(character())))
-    }
-    return(x)
-  }
   x <- dplyr::rowwise(dplyr::select(
     x, "person_id", "observation_period_start_date",
     "observation_period_end_date"

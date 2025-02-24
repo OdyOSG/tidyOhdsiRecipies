@@ -4,7 +4,7 @@ Version: 0.1.0
 Authors@R: 
     person("Alexander", "Alexeyuk", , "AlexanderAlexeyuk@gmail.com", role = c("aut", "cre"))
 Description: This package provides a set of methods for working with OHDSI (Observational Health Data Sciences and Informatics) tools, offering convenient functions for data analysis and processing.
-License: MIT + file LICENSE
+License: Apache License (>= 2)
 Suggests: 
     cli,
     DBI,

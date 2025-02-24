@@ -19,8 +19,12 @@ Capr ConceptSet s4 class.
 \examples{
 \dontrun{
 cohortDonor <- jsonlite::read_json(fs::path(
-fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
+  fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
 ))
-caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
+caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1:2]
+cohs <- purrr::map(
+  caprConceptSets,
+  ~tidyOhdsiRecipies::createCaprConceptSetCohort(.x)
+)
 }
 }
