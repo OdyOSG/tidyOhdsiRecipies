@@ -6,11 +6,12 @@
 # tidyOhdsiRecipies
 
 <!-- badges: start -->
-
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/tidyOhdsiRecipies)](https://CRAN.R-project.org/package=tidyOhdsiRecipies)
+[![Codecov test
+coverage](https://codecov.io/gh/OdyOSG/tidyOhdsiRecipies/graph/badge.svg)](https://app.codecov.io/gh/OdyOSG/tidyOhdsiRecipies)
 <!-- badges: end -->
 
 The goal of tidyOhdsiRecipies is to …

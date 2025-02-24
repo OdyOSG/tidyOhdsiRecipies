@@ -19,16 +19,17 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/tidyOhdsiRecipies)](https://CRAN.R-project.org/package=tidyOhdsiRecipies)
+[![Codecov test coverage](https://codecov.io/gh/OdyOSG/tidyOhdsiRecipies/graph/badge.svg)](https://app.codecov.io/gh/OdyOSG/tidyOhdsiRecipies)
 <!-- badges: end -->
 
-The goal of tidyOhdsiRecipies is to ...
+The goal of tidyOhdsiRecipies is to simplify and automate routine tasks when working with the Observational Medical Outcomes Partnership (OMOP) Common Data Model (CDM). This package provides a set of tools and functions to help researchers and analysts effectively manage, analyze and modify data that complies with the OMOP CDM standard.
 
 ## Installation
 
 You can install the development version of tidyOhdsiRecipies like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+remotes::install_github('OdyOSG/tidyOhdsiRecipies')
 ```
 
 ## Example
@@ -37,21 +38,10 @@ This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
 library(tidyOhdsiRecipies)
-## basic example code
+# create cohortsToCreate for `CohortGenerator` package 
+cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(
+  path = 'inst/cohorts',
+  computeAttrition = TRUE
+)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
