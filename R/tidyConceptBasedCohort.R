@@ -5,7 +5,7 @@
 #' @param conceptSet Capr concept set (Capr S4 class) with details.
 #' @param requiredObservation A vector of two integers specifying the observation period before and after the index date.
 #' @param limit A character string specifying the limit of events. Possible values are "first", "all", and "last".
-#' @param end A character string specifying the end strategy. Possible values are "observation_period_end_date", "drug_exit", and "event_end_date".
+#' @param end A character string specifying the end strategy. Possible values are "observation_period_end_date", "drug_exit", and "fixed_exit".
 #' @param endArgs A list of parameters that define the end strategy for the cohort. The list can include:
 #'   \itemize{
 #'     \item \code{conceptSet}: The Capr concept set used to define the cohort.
@@ -47,14 +47,15 @@ createCaprConceptSetCohort <- function(
     ),
     addSourceCriteria = FALSE) {
   checkmate::assert_class(conceptSet, "ConceptSet")
-  checkmate::assertIntegerish(requiredObservation, lower = 0,
-                              any.missing = FALSE, len = 2)
+  checkmate::assertIntegerish(
+    requiredObservation, lower = 0,
+    any.missing = FALSE, len = 2)
   limit <- snakecase::to_any_case(checkmate::matchArg(limit, c("first", "all", "last")),
     case = "title")
   checkmate::assertList(
     endArgs,
     any.missing = TRUE,
-    len = 6,
+    min.len = 0,
     max.len = 6,
     unique = TRUE,
     null.ok = TRUE
@@ -77,7 +78,7 @@ createCaprConceptSetCohort <- function(
       c(
         "observation_period_end_date",
         "drug_exit",
-        "event_end_date"
+        "fixed_exit"
       )
     )
   )

@@ -1,0 +1,75 @@
+---
+title: "Create many concept-based cohorts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Create many concept-based cohorts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+## Problem
+The need to create many cohorts based on a concept set/sets with simple attributes, for example, observation before the index, or special ways to exit a cohort. If you are familiar with the `Capr` package, then of course you can use it, but if your concept set contains source concepts that you would like to use, `Capr` does not allow this
+
+## Recipie 
+Collect the necessary concept sets, set up exit criteria and get cohorts
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Cooking
+Load required packages
+```{r setup}
+library(tidyOhdsiRecipies)
+library(tidyverse)
+```
+#### For this puprose we will use PHN.json cohort located in inst/cohorts directory
+
+```{r}
+## read the cohort and get list from json
+cohortDonor <- jsonlite::read_json(fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"))
+caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
+print(caprConceptSets$hiv)
+```
+
+As a result we got names list of concept sets from cohort donor
+
+```{r}
+namesOfCs <- names(caprConceptSets)
+print(namesOfCs)
+```
+
+
+```{r}
+cohorts <- purrr::map(
+  caprConceptSets,
+  ~ tidyOhdsiRecipies::createCaprConceptSetCohort(
+    conceptSet = .x,
+    limit = "all",
+    requiredObservation = c(1, 1),
+    end = "fixed_exit",
+    endArgs = list(
+        index = c("startDate"), 
+        offsetDays = 1
+    ),
+    addSourceCriteria = FALSE
+  )
+)
+names(cohorts)
+```
+```{r}
+cohortsToCreate <- createCohortsToCreate(
+  cohorts = cohorts
+)
+head(cohortsToCreate)
+```
+
+
+Or Darwin `CDMConnector` CohortSet
+
+```{r}
+CohortSet <- CirceR2CDMConn(cohorts)
+head(CohortSet)
+```

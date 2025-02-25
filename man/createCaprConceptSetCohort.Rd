@@ -21,7 +21,7 @@ createCaprConceptSetCohort(
 
 \item{requiredObservation}{A vector of two integers specifying the observation period before and after the index date.}
 
-\item{end}{A character string specifying the end strategy. Possible values are "observation_period_end_date", "drug_exit", and "event_end_date".}
+\item{end}{A character string specifying the end strategy. Possible values are "observation_period_end_date", "drug_exit", and "fixed_exit".}
 
 \item{endArgs}{A list of parameters that define the end strategy for the cohort. The list can include:
 \itemize{
