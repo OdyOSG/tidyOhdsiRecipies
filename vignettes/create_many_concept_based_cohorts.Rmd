@@ -1,5 +1,5 @@
 ---
-title: "Create many concept-based cohorts"
+title: "Create Many Concept-based Cohorts"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Create many concept-based cohorts}
@@ -23,13 +23,14 @@ knitr::opts_chunk$set(
 Load required packages
 ```{r setup}
 library(tidyOhdsiRecipies)
-library(tidyverse)
+library(dplyr)
+library(fs)
 ```
 #### For this puprose we will use PHN.json cohort located in inst/cohorts directory
 
 ```{r}
 ## read the cohort and get list from json
-cohortDonor <- jsonlite::read_json(fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"))
+cohortDonor <- jsonlite::read_json(path(path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"))
 caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
 print(caprConceptSets$hiv)
 ```
@@ -45,7 +46,7 @@ print(namesOfCs)
 ```{r}
 cohorts <- purrr::map(
   caprConceptSets,
-  ~ tidyOhdsiRecipies::createCaprConceptSetCohort(
+  ~ createCaprConceptSetCohort(
     conceptSet = .x,
     limit = "all",
     requiredObservation = c(1, 1),
@@ -59,6 +60,7 @@ cohorts <- purrr::map(
 )
 names(cohorts)
 ```
+
 ```{r}
 cohortsToCreate <- createCohortsToCreate(
   cohorts = cohorts
@@ -66,8 +68,7 @@ cohortsToCreate <- createCohortsToCreate(
 head(cohortsToCreate)
 ```
 
-
-Or Darwin `CDMConnector` CohortSet
+#### Or Darwin `CDMConnector` CohortSet
 
 ```{r}
 CohortSet <- CirceR2CDMConn(cohorts)

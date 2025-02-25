@@ -1,0 +1,70 @@
+---
+title: "Use Darwin Skipping Validation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{use-darwin-skipping-validation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+## Problem
+The [Darwin](https://github.com/darwin-eu) team has developed fantastic tools for working with OMOP CDM. The [omopgenerics](https://github.com/darwin-eu/omopgenerics) package provides a set of methods for preparing `omopgenerics` elements for operation in tidyverse style. 
+But, as often happens in life, the best is the enemy of the good... Therefore, some validation methods do not allow working with data, because observation periods may overlap, which makes it impossible to “trust” the data. Of course, this is important and useful to understand, but often we work with what we have and we do not have the opportunity to correct the data. Therefore, you just have to abandon Darwin packages and turn to OHDSI packages which, of course, is not bad, but does not allow you to adhere to the original work plan
+
+## Recipie 
+Remove some validation steps that most often lead to errors, but keep classes so you can use all Darwin packages (with caution)
+
+## Cooking
+Load required packages
+```{r setup}
+library(tidyOhdsiRecipies)
+suppressPackageStartupMessages(library(dplyr))
+library(CDMConnector)
+library(fs)
+```
+
+```{r}
+con <- DBI::dbConnect(
+  duckdb::duckdb(), 
+  eunomiaDir("GiBleed")
+  )
+
+# load usual cdm form CDMConnector
+cdmConnCdm <- cdmFromCon(
+  con, 
+  cdmSchema = "main", 
+  writeSchema = "main")
+# load tricky cdm 
+cdm <- tidyCdmFromCon(
+  con, 
+  cdmSchema = "main", 
+  writeSchema = "main")
+```
+#### Check class and table names compasion
+```{r}
+print(class(cdmConnCdm) == class(cdm))
+print(all(names(cdmConnCdm) %in% names(cdm)))
+rm(cdmConnCdm)
+```
+And also tidy way to generate cohorts
+#### Tidy Generate Cohort Set
+```{r}
+cdm <- tidyGenerate(
+  cdm,
+  cohortSet = readCohortSet(path(path_package("tidyOhdsiRecipies"), "cohorts")),
+  name = 'cohort_table'
+  )
+```
+```{r}
+!is.null(cdm$cohort_table)
+```
+#### Disconnect
+```{r}
+cdmDisconnect(cdm)
+```

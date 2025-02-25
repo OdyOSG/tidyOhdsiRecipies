@@ -2,7 +2,6 @@ test_that("Tidy CDM Referrence test", {
   numberIndividuals <- 1
   rlang::check_installed("duckdb")
   con <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
-  on.exit(duckdb::dbDisconnect(con))
   writeSchema <- "main"
   tables <- list(
     "observation_period" = data.frame(),
@@ -128,7 +127,9 @@ test_that("Tidy CDM Referrence test", {
     writeSchema = writeSchema,
     cdmName = "testing"
   )
+
   testthat::expect_s3_class(cdm, "cdm_reference")
+  CDMConnector::cdmDisconnect(cdm)
 })
 
 test_that("Tidy Generate From CDM", {
@@ -153,4 +154,5 @@ test_that("Tidy Generate From CDM", {
   testthat::expect_true(!is.null(cdm$test_cohort))
   .res <- cdm$test_cohort |> dplyr::collect()
   testthat::expect_gt(nrow(.res), 0)
+  CDMConnector::cdmDisconnect(cdm)
 })

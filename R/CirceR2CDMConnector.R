@@ -4,7 +4,7 @@
 #'
 #' @param named_cohort_list A named list of CirceR cohorts.
 #'
-#' @return A `CohortSet` object containing the cohort definitions.
+#' @return A `CohortSet` s3 object containing the cohort definitions.
 #' @export
 #'
 #' @examples
@@ -77,10 +77,51 @@ CirceR2CDMConn <- function(named_cohort_list) {
       cohortsToCreate$cohort_name[i],
       1, 1
     )
-    if (!grepl("[a-zA-Z]", first_chr)) {
-      cli::cli_abort("Cohort names must start with a letter but {cohortsToCreate$cohort_name[i]} does not.\n                     Rename the json file or use a CohortsToCreate.csv file to explicitly set cohort names.")
-    }
   }
   class(cohortsToCreate) <- c("CohortSet", class(cohortsToCreate))
   return(cohortsToCreate)
 }
+
+
+
+#' Convert Cohorts To Create to CDM Connector Format
+#'
+#' This function converts a data frame of cohorts to a format compatible with the CDM Connector.
+#'
+#' @param cohortsToCreate A data frame containing the cohorts to be converted. The data frame should include columns for cohort ID, cohort name, JSON, and SQL.
+#'
+#' @return A data frame in the CDM Connector format with class "CohortSet".
+#' @export
+#'
+#' @examples
+#' library(tidyOhdsiRecipies)
+#' path <- fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts")
+#' cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(path)
+#' CohortSet <- cohortsToCreate2CDMConn(cohortsToCreate)
+
+cohortsToCreate2CDMConn <- function(cohortsToCreate) {
+  checkmate::assert_data_frame(cohortsToCreate,
+                    min.rows = 1,
+                    min.cols = 4)
+  checkmate::assert_subset(
+    c("cohortId", "cohortName", "json", "sql"),
+    colnames(cohortsToCreate))
+  cohortsToCreate <- cohortsToCreate |>
+    dplyr::select(.data$cohortId,
+                  .data$cohortName, .data$json, .data$sql) |>
+    purrr::pmap_dfr( ~ dplyr::tibble(
+      cohort_definition_id = ..1,
+      cohort_name = ..2
+    ) |>
+      dplyr::mutate(cohort = list(jsonlite::fromJSON(..3))) |>
+      dplyr::mutate(json = ..3) |>
+      dplyr::mutate(cohort_name = stringr::str_replace_all(tolower(.data$cohort_name), "\\s", "_")) |>
+      dplyr::mutate(cohort_name = stringr::str_remove_all(.data$cohort_name, "[^a-z0-9_]")) |>
+      dplyr::mutate(cohort_definition_id = dplyr::if_else(stringr::str_detect(.data$cohort_name, "^[0-9]+$"), suppressWarnings(as.integer(.data$cohort_name)), .data$cohort_definition_id)) |>
+      dplyr::mutate(cohort_name = dplyr::if_else(stringr::str_detect(.data$cohort_name, "^[0-9]+$"), paste0("cohort_", .data$cohort_name), .data$cohort_name)) |>
+      dplyr::mutate(cohort_name_snakecase = snakecase::to_snake_case(.data$cohort_name))
+)
+  class(cohortsToCreate) <- c("CohortSet", class(cohortsToCreate))
+  return(cohortsToCreate)
+}
+

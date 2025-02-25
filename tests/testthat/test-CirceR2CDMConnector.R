@@ -21,3 +21,10 @@ test_that("test CirceR to CDM CohortSet", {
 
   testthat::expect_s3_class(cohortSet, 'CohortSet')
 })
+
+test_that("test Coh 2 Create to CDM CohortSet", {
+  path <- fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts")
+  cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(path)
+  CohortSet <- cohortsToCreate2CDMConn(cohortsToCreate)
+  testthat::expect_s3_class(CohortSet, 'CohortSet')
+})
