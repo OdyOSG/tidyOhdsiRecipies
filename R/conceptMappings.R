@@ -18,6 +18,7 @@ conceptIdsFromSources <- function(
     cdm,
     listCodes,
     vocabularyIds = c("ICD10CM")) {
+  checkmate::assertClass(cdm, "cdm_reference")
   prepCodes <- tolower(listCodes)
   prepVocab <- tolower(vocabularyIds)
   res <- cdm[["concept"]] |>
@@ -47,12 +48,13 @@ conceptIdsFromSources <- function(
 #' }
 standardFromSourceConceptIds <- function(
     cdm, sourceConceptIds) {
+  checkmate::assertClass(cdm, "cdm_reference")
   standardConcepts <- cdm[["concept_relationship"]] |>
     dplyr::filter(.data$concept_id_1 %in% sourceConceptIds &
       .data$relationship_id == "Maps to") |>
     dplyr::select(.data$concept_id_2) |>
     dplyr::distinct() |>
-    dplyr::pull(.data$concept_id_2)
+    dplyr::pull()
   return(standardConcepts)
 }
 

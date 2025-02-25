@@ -46,11 +46,23 @@ createCaprConceptSetCohort <- function(
       offsetDays = 7
     ),
     addSourceCriteria = FALSE) {
-  limit <- snakecase::to_any_case(
-    checkmate::matchArg(limit, c("first", "all", "last")),
-    case = "title"
+  checkmate::assert_class(conceptSet, "ConceptSet")
+  checkmate::assertIntegerish(requiredObservation, lower = 0,
+                              any.missing = FALSE, len = 2)
+  limit <- snakecase::to_any_case(checkmate::matchArg(limit, c("first", "all", "last")),
+    case = "title")
+  checkmate::assertList(
+    endArgs,
+    any.missing = TRUE,
+    len = 6,
+    max.len = 6,
+    unique = TRUE,
+    null.ok = TRUE
   )
-
+  checkmate::assert(
+    checkmate::check_choice(endArgs$index, choices = c("startDate", "endDate")),
+    "index must be either 'startDate' or 'endDate'"
+  )
   domains <- purrr::pluck(
     conceptSet, "Expression"
   ) |>
@@ -121,7 +133,7 @@ capr_ref <- function(domain_ids) {
     "measurement", "measurement",
     "visit", "visitOccurrence",
     "device", "deviceExposure"
-  ) %>%
+  ) |>
     dplyr::filter(.data$domain_id %in% domain_ids) |>
     dplyr::pull(.data$capr_spec)
 }

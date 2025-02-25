@@ -7,7 +7,7 @@
 collectCaprCsFromCohort(cohortDonor)
 }
 \arguments{
-\item{cohortDonor}{A list containing a cohort donor \code{jsonlite::read_json} output definition}
+\item{cohortDonor}{A list containing a cohort donor \code{jsonlite::read_json} or \code{CirceR} output definition}
 }
 \value{
 A named list of concept sets.

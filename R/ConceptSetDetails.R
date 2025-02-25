@@ -20,6 +20,9 @@
 #' detailed_concept_set <- getCaprCsDetails(capr_concept_set, cdm)
 #' }
 getCaprCsDetails <- function(x, cdm) {
+
+  checkmate::assertClass(cdm, "cdm_reference")
+  checkmate::assert(methods::is(x, "ConceptSet"), is.numeric(x))
   if (!methods::is(x, "ConceptSet")) {
     x <- Capr::cs(x, name = paste0(".name_", x[[1]]))
   }
@@ -27,7 +30,7 @@ getCaprCsDetails <- function(x, cdm) {
   df <- cdm[["concept"]] |>
     dplyr::filter(.data$concept_id %in% ids) |>
     dplyr::collect() |>
-    tibble::tibble() |>
+    dplyr::tibble() |>
     dplyr::mutate(
       invalid_reason = ifelse(is.na(.data$invalid_reason), "V", .data$invalid_reason)
     ) |>

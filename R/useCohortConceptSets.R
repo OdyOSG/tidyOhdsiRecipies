@@ -3,7 +3,7 @@
 #' This function collects concept sets from a given cohort donor and returns a named list of collection
 #' Capr ConceptSet s4 class.
 #'
-#' @param cohortDonor A list containing a cohort donor `jsonlite::read_json` output definition
+#' @param cohortDonor A list containing a cohort donor `jsonlite::read_json` or `CirceR` output definition
 #'
 #' @return A named list of concept sets.
 #' @export
@@ -20,6 +20,9 @@
 #' )
 #' }
 collectCaprCsFromCohort <- function(cohortDonor) {
+
+  checkmate::assertList(cohortDonor)
+
   .all_cs <- purrr::map(
     cohortDonor$ConceptSets, ~ purrr::pluck(.x, "expression")
   )

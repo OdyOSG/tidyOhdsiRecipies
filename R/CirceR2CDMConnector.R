@@ -29,6 +29,13 @@
 #' cohortSet <- CirceR2CDMConn(named_cohort_list)
 #' }
 CirceR2CDMConn <- function(named_cohort_list) {
+  checkmate::assertList(
+    named_cohort_list,
+    min.len = 1,
+    any.missing = FALSE,
+    types = c("list"),
+    names = "named")
+
   cohortsToCreate <- dplyr::tibble(
     cohort_definition_id = seq_along(named_cohort_list),
     cohort_name = names(named_cohort_list)

@@ -31,11 +31,16 @@ createCohortsToCreate <- function(
     path = NULL,
     cohorts = NULL,
     computeAttrition = TRUE) {
+
+  checkmate::assert(is.null(cohorts), is.null(path))
+
+  checkmate::assert(!is.null(cohorts), !is.null(path))
+
   if (!is.null(path)) {
     jsonFiles <- sort(
-      list.files(path,
-        pattern = "\\.json$",
-        full.names = TRUE
+      fs::dir_ls(
+        path,
+        pattern = "\\.json$"
       )
     )
     cohortsToCreate <- dplyr::tibble(
@@ -71,7 +76,6 @@ createCohortsToCreate <- function(
         )
       )
   }
-
   return(cohortsToCreate)
 }
 
@@ -94,3 +98,5 @@ writeListCohort <- function(cohort, path) {
   write(as.character(RJSONIO::toJSON(cohort, pretty = TRUE)), path)
   invisible(NULL)
 }
+
+
