@@ -20,7 +20,6 @@
 #' detailed_concept_set <- getCaprCsDetails(capr_concept_set, cdm)
 #' }
 getCaprCsDetails <- function(x, cdm) {
-
   checkmate::assertClass(cdm, "cdm_reference")
   checkmate::assert(methods::is(x, "ConceptSet"), is.numeric(x))
   if (!methods::is(x, "ConceptSet")) {
@@ -63,5 +62,3 @@ getCaprCsDetails <- function(x, cdm) {
   }
   return(x)
 }
-
-

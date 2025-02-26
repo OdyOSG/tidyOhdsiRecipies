@@ -38,9 +38,9 @@ This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
 library(tidyOhdsiRecipies)
-# create cohortsToCreate for `CohortGenerator` package 
+# create cohortsToCreate for `CohortGenerator` package
 cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(
-  path = 'inst/cohorts',
+  path = "inst/cohorts",
   computeAttrition = TRUE
 )
 ```

@@ -9,7 +9,7 @@ test_that("Testing CDM Mock for testeing ", {
 test_that("Testing SqLite Connection for testing", {
   con <- tidyOhdsiRecipies::returnSqLiteDatabaseConnectorCon()
   testthat::expect_s4_class(con, "DatabaseConnectorDbiConnection")
-  .res <- DatabaseConnector::querySql(con, 'select * from main.concept')
-  testthat::expect_s3_class(.res, 'data.frame')
+  .res <- DatabaseConnector::querySql(con, "select * from main.concept")
+  testthat::expect_s3_class(.res, "data.frame")
   DatabaseConnector::disconnect(con)
 })

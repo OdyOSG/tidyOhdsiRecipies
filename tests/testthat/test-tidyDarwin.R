@@ -149,7 +149,7 @@ test_that("Tidy Generate From CDM", {
   cdm <- tidyOhdsiRecipies::tidyGenerate(
     cdm,
     cohortSet = cohortSet,
-    name = 'test_cohort'
+    name = "test_cohort"
   )
   testthat::expect_true(!is.null(cdm$test_cohort))
   .res <- cdm$test_cohort |> dplyr::collect()

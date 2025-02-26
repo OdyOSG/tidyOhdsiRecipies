@@ -48,10 +48,13 @@ createCaprConceptSetCohort <- function(
     addSourceCriteria = FALSE) {
   checkmate::assert_class(conceptSet, "ConceptSet")
   checkmate::assertIntegerish(
-    requiredObservation, lower = 0,
-    any.missing = FALSE, len = 2)
+    requiredObservation,
+    lower = 0,
+    any.missing = FALSE, len = 2
+  )
   limit <- snakecase::to_any_case(checkmate::matchArg(limit, c("first", "all", "last")),
-    case = "title")
+    case = "title"
+  )
   checkmate::assertList(
     endArgs,
     any.missing = TRUE,

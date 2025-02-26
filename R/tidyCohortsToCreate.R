@@ -31,7 +31,6 @@ createCohortsToCreate <- function(
     path = NULL,
     cohorts = NULL,
     computeAttrition = TRUE) {
-
   checkmate::assert(is.null(cohorts), is.null(path))
 
   checkmate::assert(!is.null(cohorts), !is.null(path))
@@ -98,5 +97,3 @@ writeListCohort <- function(cohort, path) {
   write(as.character(RJSONIO::toJSON(cohort, pretty = TRUE)), path)
   invisible(NULL)
 }
-
-

@@ -24,7 +24,7 @@ cohortDonor <- jsonlite::read_json(fs::path(
 caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1:2]
 cohs <- purrr::map(
   caprConceptSets,
-  ~tidyOhdsiRecipies::createCaprConceptSetCohort(.x)
+  ~ tidyOhdsiRecipies::createCaprConceptSetCohort(.x)
 )
 }
 }

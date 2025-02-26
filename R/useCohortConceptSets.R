@@ -16,11 +16,10 @@
 #' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1:2]
 #' cohs <- purrr::map(
 #'   caprConceptSets,
-#'   ~tidyOhdsiRecipies::createCaprConceptSetCohort(.x)
+#'   ~ tidyOhdsiRecipies::createCaprConceptSetCohort(.x)
 #' )
 #' }
 collectCaprCsFromCohort <- function(cohortDonor) {
-
   checkmate::assertList(cohortDonor)
 
   .all_cs <- purrr::map(
@@ -31,7 +30,7 @@ collectCaprCsFromCohort <- function(cohortDonor) {
     ~ gsub("[^[:alnum:] ]", "", purrr::pluck(.x, "name")) |>
       snakecase::to_lower_camel_case()
   )
-  caprLst <- rlang::set_names(purrr::map2(.all_cs, .nms, .getNewConceptList),.nms)
+  caprLst <- rlang::set_names(purrr::map2(.all_cs, .nms, .getNewConceptList), .nms)
 
   return(caprLst)
 }
@@ -42,7 +41,6 @@ collectCaprCsFromCohort <- function(cohortDonor) {
   expression$items <- .removeItemDuplicates(
     purrr::pluck(.expression, "items")
   )
-  newConcept <- getFromNamespace("newConcept", "Capr")
   conceptList <- purrr::map(expression$items, ~ newConcept(
     id = .x$concept$CONCEPT_ID,
     isExcluded = purrr::pluck(.x, "isExcluded", .default = FALSE),
@@ -69,3 +67,4 @@ collectCaprCsFromCohort <- function(cohortDonor) {
   }
   return(uniqueItems)
 }
+newConcept <- getFromNamespace("newConcept", "Capr")

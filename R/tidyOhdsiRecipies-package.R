@@ -9,6 +9,7 @@
 #' @importFrom rlang !!
 #' @importFrom rlang !!!
 #' @importFrom rlang .data
+#' @importFrom rlang .env
 #' @importFrom rlang :=
 #' @importFrom utils getFromNamespace
 ## usethis namespace: end

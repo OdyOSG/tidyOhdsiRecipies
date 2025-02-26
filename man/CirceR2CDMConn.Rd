@@ -10,7 +10,7 @@ CirceR2CDMConn(named_cohort_list)
 \item{named_cohort_list}{A named list of CirceR cohorts.}
 }
 \value{
-A \code{CohortSet} object containing the cohort definitions.
+A \code{CohortSet} s3 object containing the cohort definitions.
 }
 \description{
 This function creates a cohort set from a named list of cohorts and returns it as a \code{CohortSet} object.

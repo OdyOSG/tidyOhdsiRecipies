@@ -34,7 +34,8 @@ CirceR2CDMConn <- function(named_cohort_list) {
     min.len = 1,
     any.missing = FALSE,
     types = c("list"),
-    names = "named")
+    names = "named"
+  )
 
   cohortsToCreate <- dplyr::tibble(
     cohort_definition_id = seq_along(named_cohort_list),
@@ -98,18 +99,21 @@ CirceR2CDMConn <- function(named_cohort_list) {
 #' path <- fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts")
 #' cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(path)
 #' CohortSet <- cohortsToCreate2CDMConn(cohortsToCreate)
-
 cohortsToCreate2CDMConn <- function(cohortsToCreate) {
   checkmate::assert_data_frame(cohortsToCreate,
-                    min.rows = 1,
-                    min.cols = 4)
+    min.rows = 1,
+    min.cols = 4
+  )
   checkmate::assert_subset(
     c("cohortId", "cohortName", "json", "sql"),
-    colnames(cohortsToCreate))
+    colnames(cohortsToCreate)
+  )
   cohortsToCreate <- cohortsToCreate |>
-    dplyr::select(.data$cohortId,
-                  .data$cohortName, .data$json, .data$sql) |>
-    purrr::pmap_dfr( ~ dplyr::tibble(
+    dplyr::select(
+      .data$cohortId,
+      .data$cohortName, .data$json, .data$sql
+    ) |>
+    purrr::pmap_dfr(~ dplyr::tibble(
       cohort_definition_id = ..1,
       cohort_name = ..2
     ) |>
@@ -119,9 +123,7 @@ cohortsToCreate2CDMConn <- function(cohortsToCreate) {
       dplyr::mutate(cohort_name = stringr::str_remove_all(.data$cohort_name, "[^a-z0-9_]")) |>
       dplyr::mutate(cohort_definition_id = dplyr::if_else(stringr::str_detect(.data$cohort_name, "^[0-9]+$"), suppressWarnings(as.integer(.data$cohort_name)), .data$cohort_definition_id)) |>
       dplyr::mutate(cohort_name = dplyr::if_else(stringr::str_detect(.data$cohort_name, "^[0-9]+$"), paste0("cohort_", .data$cohort_name), .data$cohort_name)) |>
-      dplyr::mutate(cohort_name_snakecase = snakecase::to_snake_case(.data$cohort_name))
-)
+      dplyr::mutate(cohort_name_snakecase = snakecase::to_snake_case(.data$cohort_name)))
   class(cohortsToCreate) <- c("CohortSet", class(cohortsToCreate))
   return(cohortsToCreate)
 }
-

@@ -6,4 +6,5 @@ test_that("Mapping and Gathering", {
   testthat::expect_equal(standardConcepts, 19102219)
   icd10_with_dot <- tidyOhdsiRecipies::addDot("A001")
   testthat::expect_equal(icd10_with_dot, "A00.1")
+  testthat::expect_equal(tidyOhdsiRecipies::addDot("A00"), "A00")
 })

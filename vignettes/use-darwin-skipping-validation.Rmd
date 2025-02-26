@@ -31,20 +31,22 @@ library(fs)
 
 ```{r}
 con <- DBI::dbConnect(
-  duckdb::duckdb(), 
+  duckdb::duckdb(),
   eunomiaDir("GiBleed")
-  )
+)
 
 # load usual cdm form CDMConnector
 cdmConnCdm <- cdmFromCon(
-  con, 
-  cdmSchema = "main", 
-  writeSchema = "main")
-# load tricky cdm 
+  con,
+  cdmSchema = "main",
+  writeSchema = "main"
+)
+# load tricky cdm
 cdm <- tidyCdmFromCon(
-  con, 
-  cdmSchema = "main", 
-  writeSchema = "main")
+  con,
+  cdmSchema = "main",
+  writeSchema = "main"
+)
 ```
 #### Check class and table names compasion
 ```{r}
@@ -58,8 +60,8 @@ And also tidy way to generate cohorts
 cdm <- tidyGenerate(
   cdm,
   cohortSet = readCohortSet(path(path_package("tidyOhdsiRecipies"), "cohorts")),
-  name = 'cohort_table'
-  )
+  name = "cohort_table"
+)
 ```
 ```{r}
 !is.null(cdm$cohort_table)

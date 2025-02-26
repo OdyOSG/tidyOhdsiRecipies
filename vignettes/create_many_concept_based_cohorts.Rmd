@@ -52,8 +52,8 @@ cohorts <- purrr::map(
     requiredObservation = c(1, 1),
     end = "fixed_exit",
     endArgs = list(
-        index = c("startDate"), 
-        offsetDays = 1
+      index = c("startDate"),
+      offsetDays = 1
     ),
     addSourceCriteria = FALSE
   )

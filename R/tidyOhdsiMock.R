@@ -66,15 +66,6 @@ tidyCdmMock <- function() {
     cols <- colnames(x)
     id <- c("person_id", "subject_id")
     id <- id[id %in% cols]
-    if (length(id) == 1) {
-      colDates <- cols[grepl("_date", cols)]
-      for (i in seq_along(colDates)) {
-        dates <- dplyr::union_all(dates, dplyr::tibble(
-          person_id = x[[id]],
-          date = as.Date(x[[colDates[i]]])
-        ))
-      }
-    }
   }
   tables[["observation_period"]] <- dplyr::mutate(
     dplyr::select(
@@ -213,7 +204,17 @@ returnSqLiteDatabaseConnectorCon <- function() {
   connectionDetails <- DatabaseConnector::createConnectionDetails(
     dbms = "sqlite", server = pathToSqlite
   )
+  concept_ancestor <- data.frame(
+    ancestor_concept_id = 1124300,
+    descendant_concept_id = 40032408
+  )
   con <- DatabaseConnector::connect(connectionDetails)
+  DatabaseConnector::insertTable(
+    con,
+    databaseSchema = 'main',
+    tableName = 'concept_ancestor',
+    data = concept_ancestor
+  )
   return(con)
 }
 
