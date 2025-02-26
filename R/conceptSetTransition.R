@@ -111,10 +111,7 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
   if (rlang::is_empty(ancestorConceptIdsExcl)) ancestorConceptIdsExcl <- -1L
   if (rlang::is_empty(includeNonDesc)) includeNonDesc <- -1L
   if (rlang::is_empty(excludeNonDesc)) excludeNonDesc <- -1L
-
-  conceptsDesc <- DatabaseConnector::renderTranslateQuerySql(
-    connection = con,
-    sql = "
+  sql  <- SqlRender::render("
     SELECT include_table.descendant_concept_id ids
     FROM (
     select distinct concept_id descendant_concept_id
@@ -137,12 +134,13 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
       exclude_table ON
       include_table.descendant_concept_id = exclude_table.descendant_concept_id
     AND exclude_table.descendant_concept_id IS NULL;",
-    vocabulary_database_schema = vocabularyDatabaseSchema,
-    ancestor_concept_ids_incl = ancestorConceptIdsIncl,
-    ancestor_concept_ids_excl = ancestorConceptIdsExcl,
-    include_not_desc = includeNonDesc,
-    exclude_not_desc = excludeNonDesc
-  )$IDS
+  vocabulary_database_schema = vocabularyDatabaseSchema,
+  ancestor_concept_ids_incl = ancestorConceptIdsIncl,
+  ancestor_concept_ids_excl = ancestorConceptIdsExcl,
+  include_not_desc = includeNonDesc,
+  exclude_not_desc = excludeNonDesc
+  )
+  conceptsDesc <- DBI::dbGetQuery(con, sql)$ids
 
   if (rlang::is_empty(conceptsDesc)) {
     cli::cli_abort('There is no concept ids')

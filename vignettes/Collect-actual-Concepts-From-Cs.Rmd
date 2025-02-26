@@ -1,0 +1,46 @@
+---
+title: "Collect-actual-Concepts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Collect-actual-Concepts-From-Cs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+## Problem
+Preparing end sets is an extremely important stage of working with OMOP СDM. A specialist has many functions in his arsenal that allow him to optimize the process: descendants, relationships, exclusions, etc.
+However, it happens when these functions are not available at the analysis level, which requires the specialist to create a set of concepts from the concept set in order to use all the records explicitly
+
+## Recipie 
+Collect all concept ids from concept set Capr
+
+## Cooking
+```{r setup}
+library(tidyOhdsiRecipies)
+library(dplyr)
+library(Capr)
+rlang::check_installed("Eunomia")
+```
+
+
+##### Load mock data
+```{r}
+con <- suppressMessages(DatabaseConnector::connect(Eunomia::getEunomiaConnectionDetails()))
+## Create Capr concept set with ingredient
+diclofenac <- cs(descendants(1124300), name = "diclofenac")
+```
+
+```{r}
+all_diclofenac <- listConceptIdsFromCs(diclofenac, con, vocabularyDatabaseSchema = "main")
+disconnect(con)
+all_diclofenac$diclofenac
+```
+
+#### Conclusion
+Not to good result due to lack of real descendants, but using more sufficient data you will get all the concept_ids from concept set expression

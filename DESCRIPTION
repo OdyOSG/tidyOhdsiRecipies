@@ -15,7 +15,8 @@ Suggests:
     RSQLite,
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    Eunomia
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

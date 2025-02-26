@@ -18,3 +18,10 @@ test_that("Cs Details ", {
   )
   CDMConnector::cdmDisconnect(cdm)
 })
+test_that("Cs Candidates", {
+  con <- tidyOhdsiRecipies::returnSqLiteDatabaseConnectorCon()
+  caprCand <- tidyOhdsiRecipies::collectCandidatesToCapr(
+  con, 'main', c('pneumonia'))
+  DatabaseConnector::disconnect(con)
+  testthat::expect_s4_class(caprCand, 'ConceptSet')
+})

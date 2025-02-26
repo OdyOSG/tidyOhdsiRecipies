@@ -3,6 +3,7 @@
 export(CirceR2CDMConn)
 export(addDot)
 export(cohortsToCreate2CDMConn)
+export(collectCandidatesToCapr)
 export(collectCaprCsFromCohort)
 export(conceptIdsFromSources)
 export(conceptSetExpression2CaprCs)
