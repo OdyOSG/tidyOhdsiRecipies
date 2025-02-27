@@ -1,6 +1,4 @@
-
 #' Function Collects Reg-ex Matches of Chosen Domain
-#'
 #' @param con A connection to an OMOP CDM database
 #' @param vocabularyDatabaseSchema   Schema name where your OMOP vocabulary format resides. Note that
 #'                                   for SQL Server, this should include both the database and schema
@@ -12,33 +10,33 @@
 #' @return Capr concept set
 #' @export
 #'
+#'
 #' @examples
 #' \dontrun{
 #' con <- DatabaseConnector::connect(connectionDetails)
 #' caprCand <- tidyOhdsiRecipies::collectCandidatesToCapr(
-#' con, 'cdm5', c('lobar'))
+#'   con, "cdm5", c("lobar")
+#' )
 #' }
 collectCandidatesToCapr <- function(
     con,
     vocabularyDatabaseSchema,
     keywords,
     exclude = NULL,
-    domains = "Condition"
-    ) {
+    domains = "Condition") {
   sql_in_clause <- paste0("'", paste(stringr::str_to_lower(domains), collapse = "','"), "'")
-  likePattern <- paste0('%', paste(
-    stringr::str_split_1(stringr::str_to_lower(keywords), ' '),
-    collapse = "%"), '%')
+  likePattern <- paste0("%", paste(
+    stringr::str_split_1(stringr::str_to_lower(keywords), " "),
+    collapse = "%"
+  ), "%")
   if (!is.null(exclude)) {
-    exclude <- paste0('%', paste(
-      stringr::str_split_1(stringr::str_to_lower(exclude), ' '),
-      collapse = "%"), '%')
-    }
-
-  df <- DatabaseConnector::renderTranslateQuerySql(
-    connection = con,
-    sql = "
-    SELECT distinct *
+    exclude <- paste0("%", paste(
+      stringr::str_split_1(stringr::str_to_lower(exclude), " "),
+      collapse = "%"
+    ), "%")
+  }
+  sql <- SqlRender::render(
+    "SELECT distinct *
     FROM @vocab_db_schema.concept
     WHERE lower(domain_id) IN (@domains)  AND
     LIKE(lower(concept_name), '@like_pattern')
@@ -49,8 +47,13 @@ collectCandidatesToCapr <- function(
     domains = sql_in_clause,
     like_pattern = likePattern,
     unlike_pattern = exclude,
-    should_ex = dplyr::if_else(is.null(exclude), '--', '')
-  ) |> dplyr::rename_all(tolower) |>
+    should_ex = dplyr::if_else(is.null(exclude), "--", "")
+  ) |>
+    SqlRender::translate(targetDialect = dbms(con))
+  df <- DBI::dbGetQuery(
+    con,
+    statement = sql
+  ) |>
     dplyr::tibble() |>
     dplyr::mutate(
       invalid_reason = ifelse(is.na(.data$invalid_reason), "V", .data$invalid_reason)
@@ -70,7 +73,7 @@ collectCandidatesToCapr <- function(
         TRUE ~ ""
       )
     )
-  x <- Capr::cs(df$concept_id, name = 'conceptIdCandidates')
+  x <- Capr::cs(df$concept_id, name = "conceptIdCandidates")
   checkSlotNames <- methods::slotNames("Concept")[-1]
   for (i in seq_along(x@Expression)) {
     id <- x@Expression[[i]]@Concept@concept_id

@@ -15,7 +15,8 @@ getCaprCsDetails(x, cdm)
 A Capr concept set with detailed information populated from the CDM.
 }
 \description{
-This function retrieves detailed information for a given Capr concept set or a list of concept IDs from the Common Data Model (CDM).
+This function retrieves detailed information for a given Capr concept set or a list of concept IDs from the
+cdm reference, analogue of \code{Capr::getConceptSetDetails}
 }
 \examples{
 \dontrun{

@@ -35,6 +35,7 @@ Function Collects Reg-ex Matches of Chosen Domain
 \dontrun{
 con <- DatabaseConnector::connect(connectionDetails)
 caprCand <- tidyOhdsiRecipies::collectCandidatesToCapr(
-con, 'cdm5', c('lobar'))
+  con, "cdm5", c("lobar")
+)
 }
 }

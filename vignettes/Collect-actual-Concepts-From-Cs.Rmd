@@ -17,6 +17,8 @@ knitr::opts_chunk$set(
 Preparing end sets is an extremely important stage of working with OMOP СDM. A specialist has many functions in his arsenal that allow him to optimize the process: descendants, relationships, exclusions, etc.
 However, it happens when these functions are not available at the analysis level, which requires the specialist to create a set of concepts from the concept set in order to use all the records explicitly
 
+
+
 ## Recipie 
 Collect all concept ids from concept set Capr
 

@@ -9,8 +9,7 @@ tidyCdmFromCon(
   cdmSchema,
   writeSchema,
   cohortTables = NULL,
-  cdmVersion = NULL,
-  cdmName = cdmSchema
+  cdmName = "db_id"
 )
 }
 \arguments{
@@ -21,8 +20,6 @@ tidyCdmFromCon(
 \item{writeSchema}{The schema name where the cohort tables are located.}
 
 \item{cohortTables}{A character vector of cohort table names. Default is NULL.}
-
-\item{cdmVersion}{The version of the CDM. Default is NULL.}
 
 \item{cdmName}{The name of the CDM. Default is the same as \code{cdmSchema}.}
 }

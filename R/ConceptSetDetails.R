@@ -1,6 +1,7 @@
 #' Get Capr Concept Set Details from cdm
 #'
-#' This function retrieves detailed information for a given Capr concept set or a list of concept IDs from the Common Data Model (CDM).
+#' This function retrieves detailed information for a given Capr concept set or a list of concept IDs from the
+#' cdm reference, analogue of `Capr::getConceptSetDetails`
 #'
 #' @param x A list of concept IDs or a Capr concept set (Capr S4 class).
 #' @param cdm cdm_reference via CDMConnector.

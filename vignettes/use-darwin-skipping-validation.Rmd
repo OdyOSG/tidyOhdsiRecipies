@@ -45,8 +45,7 @@ cdmConnCdm <- cdmFromCon(
 cdm <- tidyCdmFromCon(
   con,
   cdmSchema = "main",
-  writeSchema = "main"
-)
+  writeSchema = "main")
 ```
 #### Check class and table names compasion
 ```{r}
@@ -55,7 +54,10 @@ print(all(names(cdmConnCdm) %in% names(cdm)))
 rm(cdmConnCdm)
 ```
 And also tidy way to generate cohorts
+
+
 #### Tidy Generate Cohort Set
+
 ```{r}
 cdm <- tidyGenerate(
   cdm,

@@ -6,7 +6,6 @@
 #' @param cdmSchema The schema name where the CDM tables are located.
 #' @param writeSchema The schema name where the cohort tables are located.
 #' @param cohortTables A character vector of cohort table names. Default is NULL.
-#' @param cdmVersion The version of the CDM. Default is NULL.
 #' @param cdmName The name of the CDM. Default is the same as `cdmSchema`.
 #'
 #' @return A list of tidied CDM tables.
@@ -25,12 +24,8 @@ tidyCdmFromCon <- function(
     cdmSchema,
     writeSchema,
     cohortTables = NULL,
-    cdmVersion = NULL,
-    cdmName = cdmSchema) {
-  src <- CDMConnector::dbSource(
-    con = con,
-    writeSchema = writeSchema
-  )
+    cdmName = 'db_id') {
+  src <- CDMConnector::dbSource(con,  writeSchema)
   con <- attr(src, "dbcon")
   dbTables <- CDMConnector::listTables(con, schema = cdmSchema)
   omop_tables <- omopgenerics::omopTables()
@@ -52,36 +47,14 @@ tidyCdmFromCon <- function(
   )
   write_schema_tables <- CDMConnector::listTables(con, schema = writeSchema)
   for (cohort_table in cohortTables) {
-    nms <- paste0(cohort_table, c(
-      "", "_set", "_attrition",
-      "_codelist"
-    ))
-    x <- purrr::map(nms, function(nm) {
-      if (nm %in% write_schema_tables) {
-        dplyr::tbl(
-          src = src,
-          schema = writeSchema,
-          name = nm
-        )
-      } else if (nm %in% toupper(write_schema_tables)) {
-        dplyr::tbl(
-          src = src, schema = writeSchema,
-          name = toupper(nm)
-        )
-      } else {
+    if (cohort_table %in% write_schema_tables) {
+    cdm <- CDMConnector::readSourceTable(cdm, cohort_table)
+    cdm[[cohort_table]] <- omopgenerics::newCohortTable(
+      table = cdm[[cohort_table]],
+      .softValidation = TRUE
+    )}  else {
         NULL
       }
-    })
-    cdm[[cohort_table]] <- x[[1]]
-    if (is.null(cdm[[cohort_table]])) {
-      rlang::abort(glue::glue("cohort table `{cohort_table}` not found!"))
-    }
-    cdm[[cohort_table]] <- tidyNewCohortTable(
-      cdm[[cohort_table]],
-      cohortSetRef = x[[2]],
-      cohortAttritionRef = x[[3]],
-      cohortCodelistRef = x[[4]]
-    )
   }
   attr(cdm, "cdm_schema") <- cdmSchema
   attr(cdm, "write_schema") <- writeSchema
@@ -143,28 +116,6 @@ tidyGenerate <- function(
   con <- CDMConnector::cdmCon(cdm)
   write_schema <- CDMConnector::cdmWriteSchema(cdm)
   prefix <- ""
-  if ("cohortId" %in% names(cohortSet) && !("cohort_definition_id" %in%
-    names(cohortSet))) {
-    cohortSet$cohort_definition_id <- cohortSet$cohortId
-  }
-  if ("cohortName" %in% names(cohortSet) && !("cohort_name" %in%
-    names(cohortSet))) {
-    cohortSet$cohort_name <- cohortSet$cohortName
-  }
-  if (!("cohort" %in% names(cohortSet)) && ("json" %in% names(cohortSet))) {
-    cohortColumn <- list()
-    for (i in seq_len(nrow(cohortSet))) {
-      x <- cohortSet$json[i]
-      if (!validUTF8(x)) {
-        x <- stringi::stri_enc_toutf8(x, validate = TRUE)
-      }
-      if (!validUTF8(x)) {
-        rlang::abort("Failed to convert json UTF-8 encoding")
-      }
-      cohortColumn[[i]] <- jsonlite::fromJSON(x, simplifyVector = FALSE)
-    }
-    cohortSet$cohort <- cohortColumn
-  }
   existingTables <- CDMConnector::listTables(con, write_schema)
   for (x in paste0(name, c("", "_count", "_set", "_attrition"))) {
     if (x %in% existingTables) {
@@ -189,9 +140,11 @@ tidyGenerate <- function(
     )
     cohortSet$sql[i] <- SqlRender::render(cohortSql, warnOnMissingParameters = FALSE)
   }
+
   createCohortTables <- getFromNamespace(
     "createCohortTables", "CDMConnector"
   )
+
   createCohortTables(con, write_schema, name, computeAttrition)
   cdm_schema <- attr(cdm, "cdm_schema")
   cdm_schema_sql <- glue::glue_sql_collapse(DBI::dbQuoteIdentifier(
@@ -257,6 +210,7 @@ tidyGenerate <- function(
       ), target_cohort_id = cohortSet$cohort_definition_id[i],
       warnOnMissingParameters = FALSE
     )
+
     quoteSymbol <- substr(as.character(DBI::dbQuoteIdentifier(
       con,
       "a"
@@ -293,7 +247,7 @@ tidyGenerate <- function(
         s <- unname(write_schema[2])
       }
       sql <- SqlRender::translate(sql,
-        targetDialect = CDMConnector::dbms(con),
+        targetDialect = dbms(con),
         tempEmulationSchema = s
       )
     }
@@ -441,28 +395,12 @@ populateCohortSet <- getFromNamespace(
 populateCohortAttrition <- getFromNamespace(
   "populateCohortAttrition", "omopgenerics"
 )
-.validate <- function(cdm, version = "5.3") {
+.validate <- function(cdm) {
   xNames <- names(cdm)
-  x <- xNames[xNames != tolower(xNames)]
   omopTables <- omopgenerics::omopTables()
-  omopTables <- omopTables[omopTables %in% xNames]
-  for (nm in omopTables) {
-    if (nm %in% c("person", "observation_period")) {
-      cdm[[nm]] <- omopgenerics::newOmopTable(
-        cdm[[nm]],
-        version = version
-      )
-    } else {
-      cdm[[nm]] <- tryCatch(expr = {
-        omopgenerics::newOmopTable(cdm[[nm]], version = version)
-      }, error = function(e) {
-        cli::cli_warn(c(
-          "{nm} table not included in cdm because:",
-          as.character(e)
-        ))
-        return(NULL)
-      })
-    }
+  omopTables <- dplyr::intersect(omopTables, xNames)
+  for (.n in omopTables) {
+    cdm[[.n]] <- omopgenerics::newOmopTable(cdm[[.n]])
   }
   return(invisible(cdm))
 }

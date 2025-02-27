@@ -76,9 +76,8 @@ conceptSetExpression2CaprCs <- function(x) {
 #' diclofenacConceptIds <- listConceptIdsFromCs(diclofenac, con, vocabularyDatabaseSchema = "cdm5")
 #' }
 listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
-
   checkmate::assert(DBI::dbIsValid(con))
-  checkmate::assert_class(x, 'ConceptSet')
+  checkmate::assert_class(x, "ConceptSet")
   checkmate::assert_character(vocabularyDatabaseSchema)
 
   .tibb <- .capr2Tibble(x)
@@ -87,7 +86,8 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
     dplyr::filter(
       .data$includeDescendants == TRUE &
         .data$isExcluded == FALSE
-    ) |> dplyr::pull(.data$concept_id)
+    ) |>
+    dplyr::pull(.data$concept_id)
 
   ancestorConceptIdsExcl <- .tibb |>
     dplyr::filter(
@@ -111,7 +111,7 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
   if (rlang::is_empty(ancestorConceptIdsExcl)) ancestorConceptIdsExcl <- -1L
   if (rlang::is_empty(includeNonDesc)) includeNonDesc <- -1L
   if (rlang::is_empty(excludeNonDesc)) excludeNonDesc <- -1L
-  sql  <- SqlRender::render("
+  sql <- SqlRender::render(sql = "
     SELECT include_table.descendant_concept_id ids
     FROM (
     select distinct concept_id descendant_concept_id
@@ -134,63 +134,65 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
       exclude_table ON
       include_table.descendant_concept_id = exclude_table.descendant_concept_id
     AND exclude_table.descendant_concept_id IS NULL;",
-  vocabulary_database_schema = vocabularyDatabaseSchema,
-  ancestor_concept_ids_incl = ancestorConceptIdsIncl,
-  ancestor_concept_ids_excl = ancestorConceptIdsExcl,
-  include_not_desc = includeNonDesc,
-  exclude_not_desc = excludeNonDesc
-  )
-  conceptsDesc <- DBI::dbGetQuery(con, sql)$ids
+    vocabulary_database_schema = vocabularyDatabaseSchema,
+    ancestor_concept_ids_incl = ancestorConceptIdsIncl,
+    ancestor_concept_ids_excl = ancestorConceptIdsExcl,
+    include_not_desc = includeNonDesc,
+    exclude_not_desc = excludeNonDesc
+  ) |> SqlRender::translate(targetDialect = dbms(con))
+  conceptsDesc <- DBI::dbGetQuery(con, statement = sql) |>
+    dplyr::pull(.data$ids)
 
   if (rlang::is_empty(conceptsDesc)) {
-    cli::cli_abort('There is no concept ids')
+    cli::cli_abort("There is no concept ids")
   }
   res <- list()
   res[[nm]] <- conceptsDesc
   return(res)
-  }
+}
 
 .capr2Tibble <- function(x) {
   df <- dplyr::tibble(
     concept_set_name = x@Name,
     concept_id = purrr::map_int(
-    x@Expression,
-    ~ .@Concept@concept_id
-  ), concept_name = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@concept_name
-  ), domain_id = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@domain_id
-  ), vocabulary_id = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@vocabulary_id
-  ), concept_class_id = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@concept_class_id
-  ), standard_concept = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@standard_concept
-  ), standard_concept_caption = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@standard_concept_caption
-  ), concept_code = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@concept_code
-  ), invalid_reason = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@invalid_reason
-  ), invalid_reason_caption = purrr::map_chr(
-    x@Expression,
-    ~ .@Concept@invalid_reason_caption
-  ), includeDescendants = purrr::map_lgl(
-    x@Expression,
-    "includeDescendants"
-  ), isExcluded = purrr::map_lgl(
-    x@Expression,
-    "isExcluded"
-  ), includeMapped = purrr::map_lgl(
-    x@Expression,
-    "includeMapped"
-  ))
+      x@Expression,
+      ~ .@Concept@concept_id
+    ), concept_name = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@concept_name
+    ), domain_id = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@domain_id
+    ), vocabulary_id = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@vocabulary_id
+    ), concept_class_id = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@concept_class_id
+    ), standard_concept = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@standard_concept
+    ), standard_concept_caption = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@standard_concept_caption
+    ), concept_code = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@concept_code
+    ), invalid_reason = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@invalid_reason
+    ), invalid_reason_caption = purrr::map_chr(
+      x@Expression,
+      ~ .@Concept@invalid_reason_caption
+    ), includeDescendants = purrr::map_lgl(
+      x@Expression,
+      "includeDescendants"
+    ), isExcluded = purrr::map_lgl(
+      x@Expression,
+      "isExcluded"
+    ), includeMapped = purrr::map_lgl(
+      x@Expression,
+      "includeMapped"
+    )
+  )
 }
