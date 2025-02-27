@@ -63,3 +63,77 @@ getCaprCsDetails <- function(x, cdm) {
   }
   return(x)
 }
+
+
+
+
+
+#' Merge Capr Concept Sets and Concept Ids
+#'
+#' This function merges concept sets and concepts into a single concept set.
+#'
+#' @param x A named list of `ConceptSet` objects.
+#' @param conceptIds A vector of concept IDs to be included in the merged concept set.
+#'
+#' @return A `ConceptSet` object containing the merged concepts.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' conceptSet1 <- Capr::cs(conceptIds1, name = "Concept Set 1")
+#' conceptSet2 <- Capr::cs(conceptIds2, name = "Concept Set 2")
+#' mergedConceptSet <- mergeCsAndConcepts(list(conceptSet1, conceptSet2), conceptIds = 1:2)
+#' }
+mergeCsAndConcepts <- function(x, conceptIds) {
+  rlang::check_installed('tidyr')
+  checkmate::assertVector(conceptIds,
+                          any.missing = FALSE,
+                          unique = TRUE)
+  checkmate::assertList(
+    x,
+    types = "ConceptSet",
+    names = "named"
+  )
+  nm <- names(x)
+  df <- purrr::map_dfr(
+    list(purrr::chuck(x, 1), Capr::cs(conceptIds, name = nm)), .capr2Tibble
+  ) |>
+    dplyr::group_by(.data$concept_id) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup()
+
+  names(df) <- tolower(names(df))
+
+  name <- df[["name"]][1] %||% df[["concept_set_name"]][1] %||%
+    name
+  if (is.na(name) || is.null(name)) {
+    name <- ""
+  }
+  conceptDf <- dplyr::tibble(
+    id = df[["concept_id"]] %||%
+      df[["concept id"]] |> as.integer(), isExcluded = df[["isexcluded"]] %||%
+      df[["exclude"]] %||% FALSE |> as.logical(), includeDescendants = df[["includedescendants"]] %||%
+      df[["descendants"]] %||% FALSE |> as.logical(),
+    includeMapped = df[["includemapped"]] %||% df[["mapped"]] %||%
+      FALSE |> as.logical(), conceptName = df[["concept_name"]] %||%
+      df[["concept name"]] %||% "" |> as.character(),
+    standardConcept = df[["standard_concept"]] %||%
+      df[["standard concept"]] %||% "" |> as.character(),
+    standardConceptCaption = df[["standard_concept_caption"]] %||%
+      "" |> as.character(), invalidReason = df[["invalid_reason"]] %||%
+      "" |> as.character(), invalidReasonCaption = df[["invalid_reason_caption"]] %||%
+      "" |> as.character(), conceptCode = df[["concept_code"]] %||%
+      df[["concept code"]] %||% "" |> as.character(),
+    domainId = df[["domain_id"]] %||% df[["domain"]] %||%
+      "" |> as.character(), vocabularyId = df[["vocabulary_id"]] %||%
+      df[["vocabulary"]] %||% "" |> as.character(),
+    conceptClassId = df[["concept_class_id"]] %||% "" |>
+      as.character()
+  ) |> dplyr::mutate_if(
+    is.character,
+    ~ tidyr::replace_na(.x, "")
+  )
+  conceptList <- purrr::pmap(conceptDf, newConcept)
+  rlang::inject(Capr::cs(!!!conceptList, name = name))
+}
+

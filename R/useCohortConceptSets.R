@@ -76,8 +76,6 @@ injectItemsIntoCohort <- function(cohort, caprCs, position,
 }
 
 
-
-
 .getNewConceptList <- function(.expression, .nm) {
   expression <- list()
   expression$items <- .removeItemDuplicates(

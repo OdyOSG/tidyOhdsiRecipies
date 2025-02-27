@@ -76,6 +76,7 @@ conceptSetExpression2CaprCs <- function(x) {
 #' diclofenacConceptIds <- listConceptIdsFromCs(diclofenac, con, vocabularyDatabaseSchema = "cdm5")
 #' }
 listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
+
   checkmate::assert(DBI::dbIsValid(con))
   checkmate::assert_class(x, "ConceptSet")
   checkmate::assert_character(vocabularyDatabaseSchema)
