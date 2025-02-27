@@ -38,7 +38,7 @@ diclofenac <- cs(descendants(1124300), name = "diclofenac")
 
 ```{r}
 all_diclofenac <- listConceptIdsFromCs(diclofenac, con, vocabularyDatabaseSchema = "main")
-disconnect(con)
+DatabaseConnector::disconnect(con)
 all_diclofenac$diclofenac
 ```
 
