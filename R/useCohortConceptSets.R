@@ -21,7 +21,9 @@
 #' }
 collectCaprCsFromCohort <- function(cohortDonor) {
 
-  checkmate::assertList(cohortDonor)
+  checkmate::assertList(cohortDonor, names = "named")
+  checkmate::assertTRUE('ConceptSets' %in% names(cohortDonor))
+  checkmate::assertTRUE('expression' %in% names(cohortDonor$ConceptSets[[1]]))
 
   .all_cs <- purrr::map(
     cohortDonor$ConceptSets, ~ purrr::pluck(.x, "expression")
@@ -62,10 +64,10 @@ injectItemsIntoCohort <- function(
     position,
     writeCohortPath = NULL) {
   csLength <- length(cohort$ConceptSets)
-  checkmate::assert_class(caprCs, "ConceptSet")
-  checkmate::assertNumeric(position,
-                           lower = 1,
-                           upper = csLength)
+  checkmate::assertTRUE(csLength > 0)
+  checkmate::assertClass(caprCs, "ConceptSet")
+  checkmate::assertTRUE('expression' %in% names(cohortDonor$ConceptSets[[1]]))
+  checkmate::assertNumeric(position, lower = 1, upper = csLength)
   cohort$ConceptSets[[position]]$expression$items <-
     list(items = lapply(caprCs@Expression, as.list))$items
   if (!is.null(writeCohortPath)) {

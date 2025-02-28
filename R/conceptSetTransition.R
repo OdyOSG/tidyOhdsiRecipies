@@ -17,7 +17,7 @@
 #'     mapped = c(FALSE, TRUE)
 #'   ))
 #' )
-conceptSetExpression2CaprCs <- function(x) {
+darwinCSExpression2CaprCs <- function(x) {
   .nm <- names(x)
   x <- purrr::pluck(x, .nm)
   items <- purrr::map(
@@ -79,15 +79,13 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
   checkmate::assert(DBI::dbIsValid(con))
   checkmate::assert_class(x, "ConceptSet")
   checkmate::assert_character(vocabularyDatabaseSchema)
-
   .tibb <- Capr::as.data.frame(x)
   nm <- x@Name
   ancestorConceptIdsIncl <- .tibb |>
     dplyr::filter(
       .data$includeDescendants == TRUE &
         .data$isExcluded == FALSE
-    ) |>
-    dplyr::pull(.data$conceptId)
+    ) |>  dplyr::pull(.data$conceptId)
 
   ancestorConceptIdsExcl <- .tibb |>
     dplyr::filter(

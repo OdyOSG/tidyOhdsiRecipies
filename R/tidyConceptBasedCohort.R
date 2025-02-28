@@ -46,13 +46,15 @@ createCaprConceptSetCohort <- function(
       offsetDays = 7
     ),
     addSourceCriteria = FALSE) {
+
   checkmate::assert_class(conceptSet, "ConceptSet")
   checkmate::assertIntegerish(
     requiredObservation,
     lower = 0,
     any.missing = FALSE, len = 2
   )
-  limit <- snakecase::to_any_case(checkmate::matchArg(limit, c("first", "all", "last")),
+  limit <- snakecase::to_any_case(
+    checkmate::matchArg(limit, c("first", "all", "last")),
     case = "title"
   )
   checkmate::assertList(
@@ -95,8 +97,6 @@ createCaprConceptSetCohort <- function(
     fnsCalls,
     ~ prepareCall(.x, args = list(conceptSet = conceptSet))
   )
-
-
   .evals <- purrr::map_chr(
     seq_along(fnsCalls),
     ~ glue::glue("eval(fnsCalls[[{.x}]])")
@@ -121,9 +121,7 @@ createCaprConceptSetCohort <- function(
   cc@attrition@expressionLimit <- limit
   cc@entry@qualifiedLimit <- limit
   cohort <- Capr::toCirce(cc)
-
   if (addSourceCriteria) cohort <- .addSourceConceptEntry(cohort)
-
   return(cohort)
 }
 

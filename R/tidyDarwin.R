@@ -25,18 +25,50 @@ tidyCdmFromCon <- function(
     writeSchema,
     cohortTables = NULL,
     cdmName = 'db_id') {
+
+  checkmate::assertTRUE(DBI::dbIsValid(con))
+  checkmate::assertCharacter(
+    cdmName, any.missing = FALSE,
+    len = 1, null.ok = TRUE)
+  checkmate::assertCharacter(
+    cdmSchema, min.len = 1, max.len = 3,
+    any.missing = F)
+  checkmate::assertCharacter(
+    writeSchema, min.len = 1, max.len = 3,
+    any.missing = F)
+  checkmate::assertCharacter(
+    cohortTables, null.ok = TRUE,
+    min.len = 1)
+
+  if (dbms(con) == "sqlite") {
+    cli::cli_abort("SQLite is not supported by CDMConnector. Please use duckdb instead.")
+  }
+  if (methods::is(con, "DatatbaseConnectorConnection") &&
+      dbms(con) != "postgresql") {
+    cli::cli_warn("DatabaseConnector connections on {dbms(con)} are not tested!")
+  }
+  if (dbms(con) %in% c("oracle")) {
+    cli::cli_warn("Oracle database connections are not tested!")
+  }
+  if (missing(writeSchema)) {
+    cli::cli_abort("{.arg write_schema} is now required to create a cdm object with a database backend.\n                   Please make sure you have a schema in your database where you can create new tables and provide it in the `write_schema` argument.\n                   If your schema has multiple parts please provide a length 2 character vector: `write_schema = c('my_db', 'my_schema')`")
+  }
+
   src <- CDMConnector::dbSource(con,  writeSchema)
+
   con <- attr(src, "dbcon")
+
   dbTables <- CDMConnector::listTables(con, schema = cdmSchema)
+
   omop_tables <- omopgenerics::omopTables()
-  omop_tables <- omop_tables[which(omop_tables %in% tolower(dbTables))]
-  cdm_tables_in_db <- dbTables[which(tolower(dbTables) %in%
-    omop_tables)]
+
+  cdm_tables_in_db <- dplyr::intersect(omop_tables, tolower(dbTables))
+
   cdmTables <- purrr::map(omop_tables, ~ dplyr::tbl(
     src = src,
     schema = cdmSchema,
     name = .x
-  )) |> rlang::set_names(tolower(omop_tables))
+  )) |> rlang::set_names(omop_tables)
   cdm <- tidyNew(
     tables = c(cdmTables),
     cdmName = cdmName
@@ -52,9 +84,7 @@ tidyCdmFromCon <- function(
     cdm[[cohort_table]] <- omopgenerics::newCohortTable(
       table = cdm[[cohort_table]],
       .softValidation = TRUE
-    )}  else {
-        NULL
-      }
+    )}
   }
   attr(cdm, "cdm_schema") <- cdmSchema
   attr(cdm, "write_schema") <- writeSchema
@@ -69,9 +99,7 @@ tidyCdmFromCon <- function(
 tidyNew <- function(
     tables,
     cdmName) {
-  constructCdmReference <- getFromNamespace(
-    "constructCdmReference", "omopgenerics"
-  )
+  constructCdmReference <- getFromNamespace("constructCdmReference", "omopgenerics")
   cdm <- constructCdmReference(
     tables = tables,
     cdmName = cdmName,
@@ -110,10 +138,32 @@ tidyNew <- function(
 tidyGenerate <- function(
     cdm,
     cohortSet,
-    name) {
-  computeAttrition <- TRUE
-  overwrite <- TRUE
+    name,
+    computeAttrition = TRUE,
+    overwrite = TRUE) {
+  if (!is.data.frame(cohortSet)) {
+    rlang::abort("`cohortSet` must be a dataframe from the output of `readCohortSet()`.")
+  }
+  checkmate::assertDataFrame(cohortSet, min.rows = 1, col.names = "named")
+  stopifnot(all(c("cohort_definition_id", "cohort_name", "cohort",
+                  "json") %in% names(cohortSet)))
+  withr::local_options(list(cli.progress_show_after = 0, cli.progress_clear = FALSE))
   con <- CDMConnector::cdmCon(cdm)
+  checkmate::assertTRUE(DBI::dbIsValid(con))
+  checkmate::assertCharacter(name, len = 1, min.chars = 1,
+                             any.missing = FALSE)
+  if (name != tolower(name)) {
+    rlang::abort("Cohort table name {name} must be lowercase!")
+  }
+  if (!grepl("^[a-z]", substr(name, 1, 1))) {
+    cli::cli_abort("Cohort table name {name} must start with a letter!")
+  }
+  if (!grepl("^[a-z][a-z0-9_]*$", name)) {
+    cli::cli_abort("Cohort table name {name} must only contain letters, numbers, and underscores!")
+  }
+  checkmate::assertLogical(computeAttrition, len = 1)
+  checkmate::assertLogical(overwrite, len = 1)
+
   write_schema <- CDMConnector::cdmWriteSchema(cdm)
   prefix <- ""
   existingTables <- CDMConnector::listTables(con, write_schema)
@@ -123,7 +173,7 @@ tidyGenerate <- function(
         DBI::dbRemoveTable(con, .inSchema(
           write_schema,
           x,
-          dbms = CDMConnector::dbms(con)
+          dbms = dbms(con)
         ))
       } else {
         cli::cli_abort("The cohort table {paste0(prefix, name)} already exists.\nSpecify overwrite = TRUE to overwrite it.")
@@ -141,10 +191,7 @@ tidyGenerate <- function(
     cohortSet$sql[i] <- SqlRender::render(cohortSql, warnOnMissingParameters = FALSE)
   }
 
-  createCohortTables <- getFromNamespace(
-    "createCohortTables", "CDMConnector"
-  )
-
+  createCohortTables <- getFromNamespace("createCohortTables", "CDMConnector")
   createCohortTables(con, write_schema, name, computeAttrition)
   cdm_schema <- attr(cdm, "cdm_schema")
   cdm_schema_sql <- glue::glue_sql_collapse(DBI::dbQuoteIdentifier(
