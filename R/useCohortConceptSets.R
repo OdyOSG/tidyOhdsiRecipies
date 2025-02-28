@@ -20,6 +20,7 @@
 #' )
 #' }
 collectCaprCsFromCohort <- function(cohortDonor) {
+
   checkmate::assertList(cohortDonor)
 
   .all_cs <- purrr::map(
@@ -55,14 +56,16 @@ collectCaprCsFromCohort <- function(cohortDonor) {
 #' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[[1]]
 #' modifiedCohort <- injectItemsIntoCohort(cohortDonor, caprConceptSets, 2)
 #'
-injectItemsIntoCohort <- function(cohort, caprCs, position,
-                                  writeCohortPath = NULL) {
+#'
+injectItemsIntoCohort <- function(
+    cohort, caprCs,
+    position,
+    writeCohortPath = NULL) {
   csLength <- length(cohort$ConceptSets)
   checkmate::assert_class(caprCs, "ConceptSet")
-  checkmate::assert_double(position,
+  checkmate::assertNumeric(position,
                            lower = 1,
-                           upper = csLength,
-  )
+                           upper = csLength)
   cohort$ConceptSets[[position]]$expression$items <-
     list(items = lapply(caprCs@Expression, as.list))$items
   if (!is.null(writeCohortPath)) {
@@ -75,7 +78,6 @@ injectItemsIntoCohort <- function(cohort, caprCs, position,
   return(cohort)
 }
 
-
 .getNewConceptList <- function(.expression, .nm) {
   expression <- list()
   expression$items <- .removeItemDuplicates(
@@ -86,18 +88,17 @@ injectItemsIntoCohort <- function(cohort, caprCs, position,
     isExcluded = purrr::pluck(.x, "isExcluded", .default = FALSE),
     includeDescendants = purrr::pluck(.x, "includeDescendants", .default = FALSE),
     includeMapped = purrr::pluck(.x, "includeMapped", .default = FALSE),
-    conceptName = .x$concept$CONCEPT_NAME, standardConcept = .x$concept$STANDARD_CONCEPT,
+    conceptName = .x$concept$CONCEPT_NAME,
+    standardConcept = .x$concept$STANDARD_CONCEPT,
     standardConceptCaption = .x$concept$STANDARD_CONCEPT_CAPTION,
-    invalidReason = .x$concept$INVALID_REASON, conceptCode = .x$concept$CONCEPT_CODE,
-    domainId = .x$concept$DOMAIN_ID, vocabularyId = .x$concept$VOCABULARY_ID,
+    invalidReason = .x$concept$INVALID_REASON,
+    conceptCode = .x$concept$CONCEPT_CODE,
+    domainId = .x$concept$DOMAIN_ID,
+    vocabularyId = .x$concept$VOCABULARY_ID,
     conceptClassId = .x$concept$CONCEPT_CLASS_ID
   ))
   rlang::inject(Capr::cs(!!!conceptList, name = .nm))
 }
-
-
-
-
 
 .removeItemDuplicates <- function(items) {
   uniqueItems <- list()
@@ -112,7 +113,4 @@ injectItemsIntoCohort <- function(cohort, caprCs, position,
   return(uniqueItems)
 }
 
-
-
-as.list <- getFromNamespace("as.list", "Capr")
 newConcept <- getFromNamespace("newConcept", "Capr")

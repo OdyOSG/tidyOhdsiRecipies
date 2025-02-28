@@ -76,38 +76,37 @@ conceptSetExpression2CaprCs <- function(x) {
 #' diclofenacConceptIds <- listConceptIdsFromCs(diclofenac, con, vocabularyDatabaseSchema = "cdm5")
 #' }
 listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
-
   checkmate::assert(DBI::dbIsValid(con))
   checkmate::assert_class(x, "ConceptSet")
   checkmate::assert_character(vocabularyDatabaseSchema)
 
-  .tibb <- .capr2Tibble(x)
+  .tibb <- Capr::as.data.frame(x)
   nm <- x@Name
   ancestorConceptIdsIncl <- .tibb |>
     dplyr::filter(
       .data$includeDescendants == TRUE &
         .data$isExcluded == FALSE
     ) |>
-    dplyr::pull(.data$concept_id)
+    dplyr::pull(.data$conceptId)
 
   ancestorConceptIdsExcl <- .tibb |>
     dplyr::filter(
       .data$includeDescendants == TRUE &
         .data$isExcluded == TRUE
     ) |>
-    dplyr::pull(.data$concept_id)
+    dplyr::pull(.data$conceptId)
   includeNonDesc <- .tibb |>
     dplyr::filter(
       .data$isExcluded == FALSE &
         .data$includeDescendants == FALSE
     ) |>
-    dplyr::pull(.data$concept_id)
+    dplyr::pull(.data$conceptId)
   excludeNonDesc <- .tibb |>
     dplyr::filter(
       .data$isExcluded == TRUE &
         .data$includeDescendants == FALSE
     ) |>
-    dplyr::pull(.data$concept_id)
+    dplyr::pull(.data$conceptId)
   if (rlang::is_empty(ancestorConceptIdsIncl)) ancestorConceptIdsIncl <- -1L
   if (rlang::is_empty(ancestorConceptIdsExcl)) ancestorConceptIdsExcl <- -1L
   if (rlang::is_empty(includeNonDesc)) includeNonDesc <- -1L
@@ -150,50 +149,4 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
   res <- list()
   res[[nm]] <- conceptsDesc
   return(res)
-}
-
-.capr2Tibble <- function(x) {
-  df <- dplyr::tibble(
-    concept_set_name = x@Name,
-    concept_id = purrr::map_int(
-      x@Expression,
-      ~ .@Concept@concept_id
-    ), concept_name = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@concept_name
-    ), domain_id = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@domain_id
-    ), vocabulary_id = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@vocabulary_id
-    ), concept_class_id = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@concept_class_id
-    ), standard_concept = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@standard_concept
-    ), standard_concept_caption = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@standard_concept_caption
-    ), concept_code = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@concept_code
-    ), invalid_reason = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@invalid_reason
-    ), invalid_reason_caption = purrr::map_chr(
-      x@Expression,
-      ~ .@Concept@invalid_reason_caption
-    ), includeDescendants = purrr::map_lgl(
-      x@Expression,
-      "includeDescendants"
-    ), isExcluded = purrr::map_lgl(
-      x@Expression,
-      "isExcluded"
-    ), includeMapped = purrr::map_lgl(
-      x@Expression,
-      "includeMapped"
-    )
-  )
 }

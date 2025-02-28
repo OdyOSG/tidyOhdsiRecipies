@@ -81,3 +81,37 @@ addDot <- function(input_string) {
     return(input_string)
   }
 }
+
+#' Get Descendant Concepts
+#'
+#' This function retrieves the descendant concept IDs for a given set of ancestor concept IDs from a specified vocabulary database schema.
+#'
+#' @param x A vector of ancestor concept IDs.
+#' @param con A valid database connection object.
+#' @param vocabularyDatabaseSchema A character string specifying the schema of the vocabulary database.
+#'
+#' @return A vector of descendant concept IDs, including the original ancestor concept IDs.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' con <- DBI::dbConnect(RPostgres::Postgres(), dbname = "your_database")
+#' ancestor_ids <- c(21164796, 21164797)
+#' vocabulary_schema <- "cdm5"
+#' getDescendants(ancestor_ids, con, vocabulary_schema)
+#' }
+getDescendants <- function(x, con, vocabularyDatabaseSchema) {
+  checkmate::assert(DBI::dbIsValid(con))
+  checkmate::assert_vector(x)
+  checkmate::assert_character(vocabularyDatabaseSchema)
+  sql <- SqlRender::render(
+    "select distinct descendant_concept_id
+     from @vocab_schema.concept_ancestor
+     where ancestor_concept_id IN (@x)",
+    vocab_schema = vocabularyDatabaseSchema,
+    x = x
+  ) |> SqlRender::translate(targetDialect = dbms(con))
+  desc <- suppressWarnings(DBI::dbGetQuery(con, sql, immediate = TRUE)) |>
+    dplyr::pull(.data$descendant_concept_id)
+  return(dplyr::union(desc, x))
+}

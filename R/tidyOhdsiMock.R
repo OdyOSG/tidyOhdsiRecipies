@@ -21,7 +21,8 @@ tidyCdmMock <- function() {
     "observation_period" = data.frame(),
     "person" = data.frame(),
     "condition_occurrence" = data.frame(),
-    "drug_exposure" = data.frame()
+    "drug_exposure" = data.frame(),
+    'concept_ancestor' = data.frame()
   )
   omopgenerics::assertList(tables, named = TRUE, class = "data.frame")
   tables[["concept_relationship"]] <- dplyr::tribble(
@@ -29,6 +30,13 @@ tidyCdmMock <- function() {
     35207953, 4133224, "Maps to", as.Date("2020-01-01"), as.Date("2020-01-01"),
     45176377, 19102219, "Maps to", as.Date("2020-01-01"), as.Date("2020-01-01")
   )
+
+  tables[["concept_ancestor"]] <- dplyr::tribble(
+    ~ancestor_concept_id, ~descendant_concept_id,~min_levels_of_separation,
+    ~max_levels_of_separation,
+    1124300, 21164797, 1, 1
+  )
+
   tables[["concept"]] <- dplyr::tribble(
     ~concept_id, ~concept_name, ~concept_code, ~vocabulary_id,
     ~domain_id, ~concept_class_id,

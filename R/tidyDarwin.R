@@ -327,7 +327,9 @@ tidyGenerate <- function(
     cohort_attrition_ref <- NULL
   }
   cdm[[name]] <-
-    omopgenerics::newCdmTable(cohort_ref, src = attr(
+    omopgenerics::newCdmTable(
+      cohort_ref,
+          src = attr(
       cdm,
       "cdm_source"
     ), name = name)
@@ -358,7 +360,6 @@ tidyNewCohortTable <- function(
   if (!is.null(cohortCodelistRef)) {
     cohortCodelistRef <- dplyr::as_tibble(cohortCodelistRef)
   }
-  # table <- methods::removeClass(table, "cohort_table")
   attr(table, "cohort_set") <- NULL
   attr(table, "cohort_attrition") <- NULL
   attr(table, "cohort_codelist") <- NULL

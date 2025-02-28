@@ -7,4 +7,7 @@ test_that("Mapping and Gathering", {
   icd10_with_dot <- tidyOhdsiRecipies::addDot("A001")
   testthat::expect_equal(icd10_with_dot, "A00.1")
   testthat::expect_equal(tidyOhdsiRecipies::addDot("A00"), "A00")
+  r <- tidyOhdsiRecipies::getDescendants(1124300, CDMConnector::cdmCon(cdm), 'main')
+  testthat::expect_equal(r, c(21164797,  1124300))
+  CDMConnector::cdmDisconnect(cdm)
 })

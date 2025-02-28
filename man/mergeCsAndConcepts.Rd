@@ -7,7 +7,7 @@
 mergeCsAndConcepts(x, conceptIds)
 }
 \arguments{
-\item{x}{A named list of \code{ConceptSet} objects.}
+\item{x}{A named list of \code{ConceptSet}}
 
 \item{conceptIds}{A vector of concept IDs to be included in the merged concept set.}
 }
@@ -19,8 +19,7 @@ This function merges concept sets and concepts into a single concept set.
 }
 \examples{
 \dontrun{
-conceptSet1 <- Capr::cs(conceptIds1, name = "Concept Set 1")
-conceptSet2 <- Capr::cs(conceptIds2, name = "Concept Set 2")
-mergedConceptSet <- mergeCsAndConcepts(list(conceptSet1, conceptSet2), conceptIds = 1:2)
+caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1]
+mergedConceptSet <- mergeCsAndConcepts(caprConceptSets, conceptIds = 1:2)
 }
 }

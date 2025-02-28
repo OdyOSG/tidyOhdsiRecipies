@@ -72,7 +72,7 @@ getCaprCsDetails <- function(x, cdm) {
 #'
 #' This function merges concept sets and concepts into a single concept set.
 #'
-#' @param x A named list of `ConceptSet` objects.
+#' @param x A named list of `ConceptSet`
 #' @param conceptIds A vector of concept IDs to be included in the merged concept set.
 #'
 #' @return A `ConceptSet` object containing the merged concepts.
@@ -80,46 +80,51 @@ getCaprCsDetails <- function(x, cdm) {
 #'
 #' @examples
 #' \dontrun{
-#' conceptSet1 <- Capr::cs(conceptIds1, name = "Concept Set 1")
-#' conceptSet2 <- Capr::cs(conceptIds2, name = "Concept Set 2")
-#' mergedConceptSet <- mergeCsAndConcepts(list(conceptSet1, conceptSet2), conceptIds = 1:2)
+#' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1]
+#' mergedConceptSet <- mergeCsAndConcepts(caprConceptSets, conceptIds = 1:2)
 #' }
 mergeCsAndConcepts <- function(x, conceptIds) {
+
   rlang::check_installed('tidyr')
+
   checkmate::assertVector(conceptIds,
                           any.missing = FALSE,
                           unique = TRUE)
-  checkmate::assertList(
-    x,
-    types = "ConceptSet",
-    names = "named"
-  )
+    checkmate::assertList(
+      x,
+      types = "ConceptSet",
+      names = "named"
+    )
+
+
   nm <- names(x)
   df <- purrr::map_dfr(
-    list(purrr::chuck(x, 1), Capr::cs(conceptIds, name = nm)), .capr2Tibble
+    list(purrr::chuck(x, 1), Capr::cs(conceptIds, name = nm)), Capr::as.data.frame
   ) |>
-    dplyr::group_by(.data$concept_id) |>
+    dplyr::group_by(.data$conceptId) |>
     dplyr::slice(1) |>
-    dplyr::ungroup()
+    dplyr::ungroup() |>
+    dplyr::rename_all(snakecase::to_snake_case) |>
+    dplyr::mutate(name = nm)
 
-  names(df) <- tolower(names(df))
 
-  name <- df[["name"]][1] %||% df[["concept_set_name"]][1] %||%
-    name
+  name <- df[["name"]][1] %||% df[["concept_set_name"]][1]
   if (is.na(name) || is.null(name)) {
-    name <- ""
+    name <- "plug"
   }
   conceptDf <- dplyr::tibble(
     id = df[["concept_id"]] %||%
-      df[["concept id"]] |> as.integer(), isExcluded = df[["isexcluded"]] %||%
-      df[["exclude"]] %||% FALSE |> as.logical(), includeDescendants = df[["includedescendants"]] %||%
+      df[["concept id"]] |> as.integer(),
+    isExcluded = df[["is_excluded"]] %||%
+      df[["exclude"]] %||% FALSE |> as.logical(),
+    includeDescendants = df[["include_descendants"]] %||%
       df[["descendants"]] %||% FALSE |> as.logical(),
-    includeMapped = df[["includemapped"]] %||% df[["mapped"]] %||%
+    includeMapped = df[["include_mapped"]] %||% df[["mapped"]] %||%
       FALSE |> as.logical(), conceptName = df[["concept_name"]] %||%
       df[["concept name"]] %||% "" |> as.character(),
     standardConcept = df[["standard_concept"]] %||%
       df[["standard concept"]] %||% "" |> as.character(),
-    standardConceptCaption = df[["standard_concept_caption"]] %||%
+    standardConceptCaption = df[["standard_concept"]] %||%
       "" |> as.character(), invalidReason = df[["invalid_reason"]] %||%
       "" |> as.character(), invalidReasonCaption = df[["invalid_reason_caption"]] %||%
       "" |> as.character(), conceptCode = df[["concept_code"]] %||%
