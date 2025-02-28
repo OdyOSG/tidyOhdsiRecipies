@@ -4,7 +4,7 @@
 \alias{tidyGenerate}
 \title{Generate Cohorts from CDM}
 \usage{
-tidyGenerate(cdm, cohortSet, name)
+tidyGenerate(cdm, cohortSet, name, computeAttrition = TRUE, overwrite = TRUE)
 }
 \arguments{
 \item{cdm}{cdm_reference via CDMConnector.}

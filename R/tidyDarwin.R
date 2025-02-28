@@ -59,11 +59,10 @@ tidyCdmFromCon <- function(
   con <- attr(src, "dbcon")
 
   dbTables <- CDMConnector::listTables(con, schema = cdmSchema)
-
   omop_tables <- omopgenerics::omopTables()
-
-  cdm_tables_in_db <- dplyr::intersect(omop_tables, tolower(dbTables))
-
+  omop_tables <- omop_tables[which(omop_tables %in% tolower(dbTables))]
+  cdm_tables_in_db <- dbTables[which(tolower(dbTables) %in%
+                                       omop_tables)]
   cdmTables <- purrr::map(omop_tables, ~ dplyr::tbl(
     src = src,
     schema = cdmSchema,

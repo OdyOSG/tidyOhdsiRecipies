@@ -20,8 +20,8 @@ test_that("Cs Details ", {
 })
 test_that("Cs Candidates", {
   con <- tidyOhdsiRecipies::returnSqLiteDatabaseConnectorCon()
-  caprCand <- tidyOhdsiRecipies::collectCandidatesToCapr(
-  con, 'main', c('pneumonia'), 'lll')
+  caprCand <- suppressWarnings(tidyOhdsiRecipies::collectCandidatesToCapr(
+  con, 'main', c('pneumonia'), 'lll'))
   DatabaseConnector::disconnect(con)
   testthat::expect_s4_class(caprCand, 'ConceptSet')
 })
