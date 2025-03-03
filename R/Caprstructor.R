@@ -36,13 +36,14 @@
 writeCaprstructor <- function(
     entryDomains = c("drug", "condition"),
     firstTime = FALSE,
-    requiredObservation = c(1, 1),
+    requiredObservation = c(0, 0),
     attritionDomains = c("drug", "condition"),
     limit = "first",
     age = 18,
     gender = "male",
     exitStrategy = "observation_period_end_date",
     copyToClipboard = FALSE) {
+  rlang::check_installed("usethis")
   checkmate::assertChoice(
     exitStrategy,
     c("observation_period_end_date","fixed_exit", 'drug_exit'))

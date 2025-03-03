@@ -20,7 +20,8 @@ Suggests:
     tidyr,
     styler,
     rstudioapi,
-    withr
+    withr,
+    usethis
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
