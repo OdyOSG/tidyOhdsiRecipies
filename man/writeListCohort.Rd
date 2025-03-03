@@ -4,18 +4,20 @@
 \alias{writeListCohort}
 \title{Write Cohort From List Expression}
 \usage{
-writeListCohort(cohort, path)
+writeListCohort(cohort, cohortName, saveLocation)
 }
 \arguments{
-\item{cohort}{A list expression of the cohort.}
+\item{cohort}{A CirceR list expression of the cohort.}
 
-\item{path}{A character string specifying the path to save the cohort JSON file.}
+\item{cohortName}{name of the cohort}
+
+\item{saveLocation}{path to put cohort}
 }
 \description{
 This function writes a cohort list expression to a specified path in JSON format.
 }
 \examples{
 \dontrun{
-writeListCohort(cohort, "path/to/cohort.json")
+writeListCohort(cohort, "any_cohort", 'cohorts')
 }
 }

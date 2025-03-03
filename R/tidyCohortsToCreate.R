@@ -39,7 +39,7 @@ createCohortsToCreate <- function(
     jsonFiles <- sort(
       fs::dir_ls(
         path,
-        pattern = "\\.json$"
+        regexp = "\\.json$"
       )
     )
     cohortsToCreate <- dplyr::tibble(
@@ -83,17 +83,23 @@ createCohortsToCreate <- function(
 #'
 #' This function writes a cohort list expression to a specified path in JSON format.
 #'
-#' @param cohort A list expression of the cohort.
-#' @param path A character string specifying the path to save the cohort JSON file.
+#' @param cohortName name of the cohort
+#' @param saveLocation path to put cohort
+#' @param cohort A CirceR list expression of the cohort.
 #'
 #' @return NULL
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' writeListCohort(cohort, "path/to/cohort.json")
+#' writeListCohort(cohort, "any_cohort", 'cohorts')
 #' }
-writeListCohort <- function(cohort, path) {
-  write(as.character(RJSONIO::toJSON(cohort, pretty = TRUE)), path)
+writeListCohort <- function(cohort, cohortName, saveLocation) {
+
+  write(
+    RJSONIO::toJSON(cohort, pretty = TRUE),
+        fs::path(saveLocation, cohortName, ext = "json")
+    )
+
   invisible(NULL)
 }

@@ -77,9 +77,26 @@ injectItemsIntoCohort <- function(
                                len = 1, min.chars = 1,
                                pattern = "\\.json"
     )
-    writeListCohort(cohort, writeCohortPath)
+    nm <- fs::path_ext_remove(fs::path_file(writeCohortPath))
+
+    writeListCohort(cohort, nm,  fs::path_dir(writeCohortPath))
   }
   return(cohort)
+}
+
+#' Function For Testing
+#'
+#' @return json spec list of cohort definition
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cd <- returnTestDonorCohort()
+#' }
+returnTestDonorCohort <- function() {
+  return(jsonlite::read_json(fs::path(
+    fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
+  )))
 }
 
 .getNewConceptList <- function(.expression, .nm) {

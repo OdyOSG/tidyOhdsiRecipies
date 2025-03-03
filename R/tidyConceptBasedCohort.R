@@ -90,11 +90,8 @@ createCaprConceptSetCohort <- function(
   .exit <- SqlRender::snakeCaseToCamelCase(
     gsub("event_end_date", "fixed_exit", .exit)
   )
-
-  fnsCalls <- purrr::map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}"))
-
   fnsCalls <- purrr::map(
-    fnsCalls,
+    purrr::map_chr(domains, ~ glue::glue("Capr::{capr_ref(.x)}")),
     ~ prepareCall(.x, args = list(conceptSet = conceptSet))
   )
   .evals <- purrr::map_chr(
@@ -108,7 +105,6 @@ createCaprConceptSetCohort <- function(
       priorDays = requiredObservation[[1]],
       postDays  = requiredObservation[[2]]
     )),
-    primaryCriteriaLimit = limit,
     endStrategy = prepareCall(paste0("Capr::", .exit), endArgs)
   )
 
@@ -118,8 +114,11 @@ createCaprConceptSetCohort <- function(
   )
 
   cc <- eval(prepareCall("Capr::cohort", cohortAttrs))
+
+  cc@entry@primaryCriteriaLimit <- limit
   cc@attrition@expressionLimit <- limit
   cc@entry@qualifiedLimit <- limit
+
   cohort <- Capr::toCirce(cc)
   if (addSourceCriteria) cohort <- .addSourceConceptEntry(cohort)
   return(cohort)
@@ -130,10 +129,10 @@ capr_ref <- function(domain_ids) {
     ~domain_id, ~capr_spec,
     "condition", "conditionOccurrence",
     "drug", "drugExposure",
-    "procedure", "procedureOccurrence",
+    "procedure", "procedure",
     "observation", "observation",
     "measurement", "measurement",
-    "visit", "visitOccurrence",
+    "visit", "visit",
     "device", "deviceExposure"
   ) |>
     dplyr::filter(.data$domain_id %in% domain_ids) |>

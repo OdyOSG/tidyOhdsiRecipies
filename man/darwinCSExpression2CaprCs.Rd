@@ -17,7 +17,7 @@ This function converts a named list containing tibbles of concept set expression
 }
 \examples{
 # Example usage:
-caprCs <- conceptSetExpression2CaprCs(
+caprCs <- darwinCSExpression2CaprCs(
   list(test_set = dplyr::tibble(
     concept_id = c(1, 2),
     excluded = c(FALSE, TRUE),

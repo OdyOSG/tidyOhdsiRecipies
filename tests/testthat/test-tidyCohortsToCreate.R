@@ -1,12 +1,12 @@
 test_that("write cohort test", {
   cohort <- jsonlite::read_json(fs::path(
     fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
-  ))
-  path <- tempfile("tmp.json")
-  on.exit(fs::file_delete(path))
-  tidyOhdsiRecipies::writeListCohort(cohort, path)
-  .res <- jsonlite::read_json(path)
+  ))[[1]]
+
+  tidyOhdsiRecipies::writeListCohort(cohort, cohortName = 'testing', saveLocation = '.')
+  .res <- jsonlite::read_json('testing.json')
   testthat::expect_type(.res, "list")
+  fs::file_delete('testing.json')
 })
 
 test_that("test CohortsToCreate", {

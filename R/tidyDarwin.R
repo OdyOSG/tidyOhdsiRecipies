@@ -119,6 +119,8 @@ tidyNew <- function(
 #' @param cdm cdm_reference via CDMConnector.
 #' @param cohortSet A data frame containing the cohort definitions, including JSON expressions. `CDMConnector::readCohortSet` output
 #' @param name The base name for the cohort tables.
+#' @param computeAttrition boolean. Should attrition be calculated?
+#' @param overwrite boolean.  Should table be overwritten?
 #'
 #' @return A list of generated cohorts.
 #' @export
@@ -140,6 +142,7 @@ tidyGenerate <- function(
     name,
     computeAttrition = TRUE,
     overwrite = TRUE) {
+  rlang::check_installed("withr")
   if (!is.data.frame(cohortSet)) {
     rlang::abort("`cohortSet` must be a dataframe from the output of `readCohortSet()`.")
   }

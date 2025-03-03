@@ -12,6 +12,10 @@ tidyGenerate(cdm, cohortSet, name, computeAttrition = TRUE, overwrite = TRUE)
 \item{cohortSet}{A data frame containing the cohort definitions, including JSON expressions. \code{CDMConnector::readCohortSet} output}
 
 \item{name}{The base name for the cohort tables.}
+
+\item{computeAttrition}{boolean. Should attrition be calculated?}
+
+\item{overwrite}{boolean.  Should table be overwritten?}
 }
 \value{
 A list of generated cohorts.

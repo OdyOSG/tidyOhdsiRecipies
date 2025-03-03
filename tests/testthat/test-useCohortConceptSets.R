@@ -7,6 +7,7 @@ test_that("Concepts From Cohort", {
   caprConceptSets <- collectCaprCsFromCohort(cohortDonor)
   testthat::expect_s4_class(caprConceptSets[[1]], "ConceptSet")
   testthat::expect_vector(names(caprConceptSets), "character")
+  testthat::expect_identical(returnTestDonorCohort(), cohortDonor)
 })
 test_that("Cs Details ", {
   cdm <- tidyOhdsiRecipies::tidyCdmMock()
@@ -39,13 +40,13 @@ test_that("Inject Itest", {
   testthat::expect_equal(
     cn,
     modCoh$ConceptSets[[3]]$expression$items[[1]]$concept$CONCEPT_NAME)
-  tempF <- tempfile('t.json')
+  writeCohortPath <- 'te_st.json'
   modCoh <- injectItemsIntoCohort(cohortDonor, caprConceptSets$phn, position = 3,
-                                  writeCohortPath = tempF)
-  .res <- jsonlite::read_json(tempF)
+                                  writeCohortPath = writeCohortPath)
+  .res <- jsonlite::read_json(writeCohortPath)
 
   testthat::expect_type(.res, "list")
 
-  fs::file_delete(tempF)
+  fs::file_delete(writeCohortPath)
 
 })
