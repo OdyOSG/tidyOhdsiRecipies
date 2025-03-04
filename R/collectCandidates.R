@@ -87,6 +87,3 @@ collectCandidatesToCapr <- function(
   }
   return(x)
 }
-
-
-

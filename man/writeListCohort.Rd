@@ -18,6 +18,6 @@ This function writes a cohort list expression to a specified path in JSON format
 }
 \examples{
 \dontrun{
-writeListCohort(cohort, "any_cohort", 'cohorts')
+writeListCohort(cohort, "any_cohort", "cohorts")
 }
 }

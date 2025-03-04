@@ -24,37 +24,46 @@ tidyCdmFromCon <- function(
     cdmSchema,
     writeSchema,
     cohortTables = NULL,
-    cdmName = 'db_id') {
+    cdmName = "db_id") {
 
   checkmate::assertTRUE(DBI::dbIsValid(con))
+
   checkmate::assertCharacter(
-    cdmName, any.missing = FALSE,
-    len = 1, null.ok = TRUE)
+    cdmName,
+    any.missing = FALSE,
+    len = 1, null.ok = TRUE
+  )
   checkmate::assertCharacter(
-    cdmSchema, min.len = 1, max.len = 3,
-    any.missing = F)
+    cdmSchema,
+    min.len = 1, max.len = 3,
+    any.missing = F
+  )
   checkmate::assertCharacter(
-    writeSchema, min.len = 1, max.len = 3,
-    any.missing = F)
+    writeSchema,
+    min.len = 1, max.len = 3,
+    any.missing = F
+  )
   checkmate::assertCharacter(
-    cohortTables, null.ok = TRUE,
-    min.len = 1)
+    cohortTables,
+    null.ok = TRUE,
+    min.len = 1
+  )
 
   if (dbms(con) == "sqlite") {
     cli::cli_abort("SQLite is not supported by CDMConnector. Please use duckdb instead.")
   }
   if (methods::is(con, "DatatbaseConnectorConnection") &&
-      dbms(con) != "postgresql") {
+    dbms(con) != "postgresql") {
     cli::cli_warn("DatabaseConnector connections on {dbms(con)} are not tested!")
   }
   if (dbms(con) %in% c("oracle")) {
     cli::cli_warn("Oracle database connections are not tested!")
   }
   if (missing(writeSchema)) {
-    cli::cli_abort("{.arg write_schema} is now required to create a cdm object with a database backend.\n                   Please make sure you have a schema in your database where you can create new tables and provide it in the `write_schema` argument.\n                   If your schema has multiple parts please provide a length 2 character vector: `write_schema = c('my_db', 'my_schema')`")
+    cli::cli_abort("{.arg writeSchema} is now required to create a cdm object with a database backend.\n                   Please make sure you have a schema in your database where you can create new tables and provide it in the `write_schema` argument.\n                   If your schema has multiple parts please provide a length 2 character vector: `write_schema = c('my_db', 'my_schema')`")
   }
 
-  src <- CDMConnector::dbSource(con,  writeSchema)
+  src <- CDMConnector::dbSource(con, writeSchema)
 
   con <- attr(src, "dbcon")
 
@@ -62,7 +71,7 @@ tidyCdmFromCon <- function(
   omop_tables <- omopgenerics::omopTables()
   omop_tables <- omop_tables[which(omop_tables %in% tolower(dbTables))]
   cdm_tables_in_db <- dbTables[which(tolower(dbTables) %in%
-                                       omop_tables)]
+    omop_tables)]
   cdmTables <- purrr::map(omop_tables, ~ dplyr::tbl(
     src = src,
     schema = cdmSchema,
@@ -79,11 +88,12 @@ tidyCdmFromCon <- function(
   write_schema_tables <- CDMConnector::listTables(con, schema = writeSchema)
   for (cohort_table in cohortTables) {
     if (cohort_table %in% write_schema_tables) {
-    cdm <- CDMConnector::readSourceTable(cdm, cohort_table)
-    cdm[[cohort_table]] <- omopgenerics::newCohortTable(
-      table = cdm[[cohort_table]],
-      .softValidation = TRUE
-    )}
+      cdm <- CDMConnector::readSourceTable(cdm, cohort_table)
+      cdm[[cohort_table]] <- omopgenerics::newCohortTable(
+        table = cdm[[cohort_table]],
+        .softValidation = TRUE
+      )
+    }
   }
   attr(cdm, "cdm_schema") <- cdmSchema
   attr(cdm, "write_schema") <- writeSchema
@@ -147,13 +157,17 @@ tidyGenerate <- function(
     rlang::abort("`cohortSet` must be a dataframe from the output of `readCohortSet()`.")
   }
   checkmate::assertDataFrame(cohortSet, min.rows = 1, col.names = "named")
-  stopifnot(all(c("cohort_definition_id", "cohort_name", "cohort",
-                  "json") %in% names(cohortSet)))
+  stopifnot(all(c(
+    "cohort_definition_id", "cohort_name", "cohort",
+    "json"
+  ) %in% names(cohortSet)))
   withr::local_options(list(cli.progress_show_after = 0, cli.progress_clear = FALSE))
   con <- CDMConnector::cdmCon(cdm)
   checkmate::assertTRUE(DBI::dbIsValid(con))
-  checkmate::assertCharacter(name, len = 1, min.chars = 1,
-                             any.missing = FALSE)
+  checkmate::assertCharacter(name,
+    len = 1, min.chars = 1,
+    any.missing = FALSE
+  )
   if (name != tolower(name)) {
     rlang::abort("Cohort table name {name} must be lowercase!")
   }
@@ -378,69 +392,32 @@ tidyGenerate <- function(
   cdm[[name]] <-
     omopgenerics::newCdmTable(
       cohort_ref,
-          src = attr(
-      cdm,
-      "cdm_source"
-    ), name = name)
+      src = attr(
+        cdm,
+        "cdm_source"
+      ), name = name
+    )
   cohortSetRef <- dplyr::transmute(cohortSet,
     cohort_definition_id = as.integer(.data$cohort_definition_id),
     cohort_name = as.character(.data$cohort_name)
   )
-  cdm[[name]] <- tidyNewCohortTable(
+  cdm[[name]] <- omopgenerics::newCohortTable(
     table = cdm[[name]],
     cohortSetRef = cohortSetRef,
-    cohortAttritionRef = cohort_attrition_ref
+    cohortAttritionRef = cohort_attrition_ref,
+    cohortCodelistRef = NULL,
+    .softValidation = TRUE
   )
+
   cli::cli_progress_done()
   return(cdm)
 }
 
-tidyNewCohortTable <- function(
-    table,
-    cohortAttritionRef,
-    cohortSetRef = attr(table, "cohort_set"),
-    cohortCodelistRef = attr(table, "cohort_codelist")) {
-  if (!is.null(cohortSetRef)) {
-    cohortSetRef <- dplyr::as_tibble(cohortSetRef)
-  }
-  if (!is.null(cohortAttritionRef)) {
-    cohortAttritionRef <- dplyr::as_tibble(cohortAttritionRef)
-  }
-  if (!is.null(cohortCodelistRef)) {
-    cohortCodelistRef <- dplyr::as_tibble(cohortCodelistRef)
-  }
-  attr(table, "cohort_set") <- NULL
-  attr(table, "cohort_attrition") <- NULL
-  attr(table, "cohort_codelist") <- NULL
-
-  cohortSetRef <- populateCohortSet(table, cohortSetRef)
-  cohortAttritionRef <- populateCohortAttrition(
-    table, cohortSetRef,
-    cohortAttritionRef
-  )
-  cohortCodelistRef <- populateCohortCodelist(table, cohortCodelistRef)
-  cohort <- constructGeneratedCohortSet(
-    table = table, cohortSetRef = cohortSetRef,
-    cohortAttritionRef = cohortAttritionRef, cohortCodelistRef = cohortCodelistRef
-  )
-  return(cohort)
-}
-
-populateCohortCodelist <- getFromNamespace(
-  "populateCohortCodelist", "omopgenerics"
-)
-
-constructGeneratedCohortSet <- getFromNamespace(
-  "constructGeneratedCohortSet", "omopgenerics"
-)
 .inSchema <- getFromNamespace(
   ".inSchema", "CDMConnector"
 )
 computeAttritionTable <- getFromNamespace(
   "computeAttritionTable", "CDMConnector"
-)
-populateCohortSet <- getFromNamespace(
-  "populateCohortSet", "omopgenerics"
 )
 populateCohortAttrition <- getFromNamespace(
   "populateCohortAttrition", "omopgenerics"

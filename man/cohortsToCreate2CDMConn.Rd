@@ -18,6 +18,6 @@ This function converts a data frame of cohorts to a format compatible with the C
 \examples{
 library(tidyOhdsiRecipies)
 path <- fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts")
-cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(path)
+cohortsToCreate <- tidyOhdsiRecipies::createCohortDefinitionSet(path)
 CohortSet <- cohortsToCreate2CDMConn(cohortsToCreate)
 }

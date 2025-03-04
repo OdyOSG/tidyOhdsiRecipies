@@ -46,18 +46,24 @@ writeCaprstructor <- function(
   rlang::check_installed("usethis")
   checkmate::assertChoice(
     exitStrategy,
-    c("observation_period_end_date","fixed_exit", 'drug_exit'))
+    c("observation_period_end_date", "fixed_exit", "drug_exit")
+  )
   checkmate::assertNumeric(age, lower = 1)
-  checkmate::assertIntegerish(requiredObservation,  lower = 0,  any.missing = FALSE, len = 2)
-  checkmate::assertTRUE(all(entryDomains %in%  c(   "condition", "drug", "procedure", "observation",
-        "measurement", "visit", "device")))
-  checkmate::assert(checkmate::assertTRUE(all(attritionDomains %in% c(
-          "condition", "drug", "procedure", "observation",
-          "measurement", "visit", "device"))),
-    checkmate::assertNull(attritionDomains))
+  checkmate::assertIntegerish(requiredObservation, lower = 0, any.missing = FALSE, len = 2)
+  checkmate::assertTRUE(all(entryDomains %in% c(
+    "condition", "drug", "procedure", "observation",
+    "measurement", "visit", "device"
+  )))
+  checkmate::assert(
+    checkmate::assertTRUE(all(attritionDomains %in% c(
+      "condition", "drug", "procedure", "observation",
+      "measurement", "visit", "device"
+    ))),
+    checkmate::assertNull(attritionDomains)
+  )
   checkmate::assertTRUE(rlang::is_installed("rstudioapi"))
   checkmate::assertTRUE(rlang::is_installed("styler"))
-  limit <- snakecase::to_any_case(checkmate::matchArg(limit, c("first", "all", "last")),case = "title")
+  limit <- snakecase::to_any_case(checkmate::matchArg(limit, c("first", "all", "last")), case = "title")
   temp <- templatingCapr()
   .res <- paste0(
     temp$entry,
@@ -80,7 +86,7 @@ writeCaprstructor <- function(
     temp$exitClose
   ) |> styler::style_text()
   styler::cache_clear(ask = FALSE)
-  if (copyToClipboard) usethis::ui_code_block(.res)# write(.res, file = rstudioapi::getSourceEditorContext()$path, append = TRUE)
+  if (copyToClipboard) usethis::ui_code_block(.res) # write(.res, file = rstudioapi::getSourceEditorContext()$path, append = TRUE)
   return(.res)
 }
 

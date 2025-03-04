@@ -45,7 +45,8 @@ cdmConnCdm <- cdmFromCon(
 cdm <- tidyCdmFromCon(
   con,
   cdmSchema = "main",
-  writeSchema = "main")
+  writeSchema = "main"
+)
 ```
 #### Check class and table names compasion
 ```{r}

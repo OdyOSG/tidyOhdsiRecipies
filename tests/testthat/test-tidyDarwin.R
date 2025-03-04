@@ -107,9 +107,9 @@ test_that("Tidy CDM Referrence test", {
       .data$start_year, .data$year_of_birth, .data$start_year)),
     -"start_year"
   )
-  tables[['ct']] <- dplyr::tribble(
-    ~cohort_definition_id, ~subject_id, ~cohort_start_date,~cohort_end_date,
-    1,2,as.Date('2020-01-01'),as.Date('2020-01-01')
+  tables[["ct"]] <- dplyr::tribble(
+    ~cohort_definition_id, ~subject_id, ~cohort_start_date, ~cohort_end_date,
+    1, 2, as.Date("2020-01-01"), as.Date("2020-01-01")
   )
   tablesToInsert <- names(tables)
   src <- CDMConnector::dbSource(con = con, writeSchema = writeSchema)
@@ -130,7 +130,7 @@ test_that("Tidy CDM Referrence test", {
     con = con,
     cdmSchema = writeSchema,
     writeSchema = writeSchema,
-    cohortTables = 'ct',
+    cohortTables = "ct",
     cdmName = "testing"
   )
 
@@ -162,3 +162,4 @@ test_that("Tidy Generate From CDM", {
   testthat::expect_gt(nrow(.res), 0)
   CDMConnector::cdmDisconnect(cdm)
 })
+

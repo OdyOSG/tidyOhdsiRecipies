@@ -46,7 +46,6 @@ createCaprConceptSetCohort <- function(
       offsetDays = 7
     ),
     addSourceCriteria = FALSE) {
-
   checkmate::assert_class(conceptSet, "ConceptSet")
   checkmate::assertIntegerish(
     requiredObservation,

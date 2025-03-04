@@ -7,7 +7,7 @@
 writeCaprstructor(
   entryDomains = c("drug", "condition"),
   firstTime = FALSE,
-  requiredObservation = c(1, 1),
+  requiredObservation = c(0, 0),
   attritionDomains = c("drug", "condition"),
   limit = "first",
   age = 18,

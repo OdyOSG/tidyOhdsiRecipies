@@ -1,4 +1,4 @@
-#' Create Cohorts To Create Tibble
+#' Create Cohorts To Create Tibble For `CohortGenerator`
 #'
 #' This function creates a tibble for the `CohortGenerator` package from cohort JSON files or a list of `CirceR` cohorts.
 #'
@@ -26,8 +26,11 @@
 #'     ff |> fs::path_file() |>
 #'       fs::path_ext_remove()
 #'   )
+#'
+#'  generationSet <-createCohortDefinitionSet(cohorts = cohorts)
 #' }
-createCohortsToCreate <- function(
+#'
+createCohortDefinitionSet <- function(
     path = NULL,
     cohorts = NULL,
     computeAttrition = TRUE) {
@@ -92,14 +95,13 @@ createCohortsToCreate <- function(
 #'
 #' @examples
 #' \dontrun{
-#' writeListCohort(cohort, "any_cohort", 'cohorts')
+#' writeListCohort(cohort, "any_cohort", "cohorts")
 #' }
 writeListCohort <- function(cohort, cohortName, saveLocation) {
-
   write(
     RJSONIO::toJSON(cohort, pretty = TRUE),
-        fs::path(saveLocation, cohortName, ext = "json")
-    )
+    fs::path(saveLocation, cohortName, ext = "json")
+  )
 
   invisible(NULL)
 }

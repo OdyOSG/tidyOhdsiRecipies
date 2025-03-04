@@ -22,31 +22,33 @@ test_that("Cs Details ", {
 test_that("Cs Candidates", {
   con <- tidyOhdsiRecipies::returnSqLiteDatabaseConnectorCon()
   caprCand <- suppressWarnings(tidyOhdsiRecipies::collectCandidatesToCapr(
-  con, 'main', c('pneumonia'), 'lll'))
+    con, "main", c("pneumonia"), "lll"
+  ))
   DatabaseConnector::disconnect(con)
-  testthat::expect_s4_class(caprCand, 'ConceptSet')
+  testthat::expect_s4_class(caprCand, "ConceptSet")
 })
-
-
-
 test_that("Inject Itest", {
   cohortDonor <- jsonlite::read_json(fs::path(
     fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
   ))
   cn <- "Post-herpetic polyneuropathy"
   caprConceptSets <- collectCaprCsFromCohort(cohortDonor)[1]
-  modCoh <- injectItemsIntoCohort(cohortDonor, caprConceptSets$phn, position = 3,
-                                    writeCohortPath = NULL)
+  modCoh <- injectItemsIntoCohort(cohortDonor, caprConceptSets$phn,
+    position = 3,
+    writeCohortPath = NULL
+  )
   testthat::expect_equal(
     cn,
-    modCoh$ConceptSets[[3]]$expression$items[[1]]$concept$CONCEPT_NAME)
-  writeCohortPath <- 'te_st.json'
-  modCoh <- injectItemsIntoCohort(cohortDonor, caprConceptSets$phn, position = 3,
-                                  writeCohortPath = writeCohortPath)
+    modCoh$ConceptSets[[3]]$expression$items[[1]]$concept$CONCEPT_NAME
+  )
+  writeCohortPath <- "te_st.json"
+  modCoh <- injectItemsIntoCohort(cohortDonor, caprConceptSets$phn,
+    position = 3,
+    writeCohortPath = writeCohortPath
+  )
   .res <- jsonlite::read_json(writeCohortPath)
 
   testthat::expect_type(.res, "list")
 
   fs::file_delete(writeCohortPath)
-
 })

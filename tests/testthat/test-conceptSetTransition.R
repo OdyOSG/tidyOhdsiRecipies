@@ -20,7 +20,7 @@ testthat::test_that("Cs To List Concept Ids", {
   testthat::expect_contains(diclofenacConceptIds, 40032408)
   testthat::expect_error(tidyOhdsiRecipies::listConceptIdsFromCs(dummyCs, con, vocabularyDatabaseSchema = "main"))
   disconnect(con)
-  })
+})
 
 
 test_that("mergeCsAndConcepts", {
@@ -29,5 +29,5 @@ test_that("mergeCsAndConcepts", {
   ))
   caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1]
   .res <- mergeCsAndConcepts(caprConceptSets, conceptIds = 2:4)
-  testthat::expect_s4_class(.res, 'ConceptSet')
+  testthat::expect_s4_class(.res, "ConceptSet")
 })

@@ -22,7 +22,7 @@ tidyCdmMock <- function() {
     "person" = data.frame(),
     "condition_occurrence" = data.frame(),
     "drug_exposure" = data.frame(),
-    'concept_ancestor' = data.frame()
+    "concept_ancestor" = data.frame()
   )
   omopgenerics::assertList(tables, named = TRUE, class = "data.frame")
   tables[["concept_relationship"]] <- dplyr::tribble(
@@ -32,7 +32,7 @@ tidyCdmMock <- function() {
   )
 
   tables[["concept_ancestor"]] <- dplyr::tribble(
-    ~ancestor_concept_id, ~descendant_concept_id,~min_levels_of_separation,
+    ~ancestor_concept_id, ~descendant_concept_id, ~min_levels_of_separation,
     ~max_levels_of_separation,
     1124300, 21164797, 1, 1
   )
@@ -219,8 +219,8 @@ returnSqLiteDatabaseConnectorCon <- function() {
   con <- DatabaseConnector::connect(connectionDetails)
   DatabaseConnector::insertTable(
     con,
-    databaseSchema = 'main',
-    tableName = 'concept_ancestor',
+    databaseSchema = "main",
+    tableName = "concept_ancestor",
     data = concept_ancestor
   )
   return(con)

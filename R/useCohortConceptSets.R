@@ -20,10 +20,9 @@
 #' )
 #' }
 collectCaprCsFromCohort <- function(cohortDonor) {
-
   checkmate::assertList(cohortDonor, names = "named")
-  checkmate::assertTRUE('ConceptSets' %in% names(cohortDonor))
-  checkmate::assertTRUE('expression' %in% names(cohortDonor$ConceptSets[[1]]))
+  checkmate::assertTRUE("ConceptSets" %in% names(cohortDonor))
+  checkmate::assertTRUE("expression" %in% names(cohortDonor$ConceptSets[[1]]))
 
   .all_cs <- purrr::map(
     cohortDonor$ConceptSets, ~ purrr::pluck(.x, "expression")
@@ -53,18 +52,16 @@ collectCaprCsFromCohort <- function(cohortDonor) {
 #' @examples
 #' # Example usage:
 #' cohortDonor <- jsonlite::read_json(fs::path(
-#' fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
+#'   fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
 #' ))
 #' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[[1]]
 #' modifiedCohort <- injectItemsIntoCohort(cohortDonor, caprConceptSets, 2)
-#'
 #'
 injectItemsIntoCohort <- function(
     cohort,
     caprCs,
     position,
     writeCohortPath = NULL) {
-
   csLength <- length(cohort$ConceptSets)
   checkmate::assertTRUE(csLength > 0)
   checkmate::assertClass(caprCs, "ConceptSet")
@@ -74,12 +71,12 @@ injectItemsIntoCohort <- function(
     list(items = lapply(caprCs@Expression, .fAsListItem))$items
   if (!is.null(writeCohortPath)) {
     checkmate::assertCharacter(writeCohortPath,
-                               len = 1, min.chars = 1,
-                               pattern = "\\.json"
+      len = 1, min.chars = 1,
+      pattern = "\\.json"
     )
     nm <- fs::path_ext_remove(fs::path_file(writeCohortPath))
 
-    writeListCohort(cohort, nm,  fs::path_dir(writeCohortPath))
+    writeListCohort(cohort, nm, fs::path_dir(writeCohortPath))
   }
   return(cohort)
 }
@@ -133,21 +130,17 @@ returnTestDonorCohort <- function() {
   }
   return(uniqueItems)
 }
-
 newConcept <- getFromNamespace("newConcept", "Capr")
 
-.fAsList <- function(x) {
-  list('id' = x@id,
-       'name' = x@Name,
-       'expression' = list('items' = lapply(x@Expression, .fAsListItem)))
+.fAsListItem <- function(x) {
+  list(
+    "concept" = .fAsListConcept(x@Concept),
+    "isExcluded" = x@isExcluded,
+    "includeDescendants" = x@includeDescendants,
+    "includeMapped" = x@includeMapped
+  )
 }
-.fAsListItem <- function(x){
-  list('concept' = .fAsListConcept(x@Concept),
-       'isExcluded' = x@isExcluded,
-       'includeDescendants' = x@includeDescendants,
-       'includeMapped' = x@includeMapped)
-}
-.fAsListConcept <- function(x){
+.fAsListConcept <- function(x) {
   nm <- methods::slotNames(methods::is(x))
   concept <- lapply(nm, methods::slot, object = x)
   # Convert NA_character to empty string

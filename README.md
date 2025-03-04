@@ -1,3 +1,4 @@
+
 # tidyOhdsiRecipies <img src="man/figures/logo.jpg" align="right" height="92" alt="" />
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -24,15 +25,47 @@ and modify data that complies with the OMOP CDM standard.
 
 You can install the development version of tidyOhdsiRecipies like so:
 
-    remotes::install_github('OdyOSG/tidyOhdsiRecipies')
+``` r
+# install.packages('remotes')
+remotes::install_github('OdyOSG/tidyOhdsiRecipies')
+```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Reading json cohorts representation to `CohortGenerator` definition set
+and / or convert it to Darwin `CDMConnector` cohort set in case your are
+using `PhenotypeLibrary` package
 
-    library(tidyOhdsiRecipies)
-    # create cohortsToCreate for `CohortGenerator` package 
-    cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(
-      path = 'inst/cohorts',
-      computeAttrition = TRUE
-    )
+``` r
+library(tidyOhdsiRecipies)
+# create cohortsToCreate for `CohortGenerator` package
+# Case 1
+cohortsToCreate <- tidyOhdsiRecipies::createCohortDefinitionSet(
+  path = "inst/cohorts",
+  computeAttrition = TRUE
+)
+
+### if you want to use Darwin
+cohortSet <- cohortsToCreate2CDMConn(cohortsToCreate)
+# Case 2
+# You need to build 100 covariate cohorts from concept sets that have different domains and contain both standard and source codes.
+caprConceptSets <- collectCaprCsFromCohort(returnTestDonorCohort())
+cohorts <- purrr::map(
+  caprConceptSets,
+  ~ createCaprConceptSetCohort(
+    conceptSet = .x,
+    limit = "all",
+    requiredObservation = c(1, 1),
+    end = "fixed_exit",
+    endArgs = list(
+      index = c("startDate"),
+      offsetDays = 1
+    ),
+    addSourceCriteria = TRUE
+  )
+)
+## then you can deliver it to cohortsToCreate
+cohortsToCreate <- createCohortDefinitionSet(
+  cohorts = cohorts
+)
+```

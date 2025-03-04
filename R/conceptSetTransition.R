@@ -85,7 +85,8 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
     dplyr::filter(
       .data$includeDescendants == TRUE &
         .data$isExcluded == FALSE
-    ) |>  dplyr::pull(.data$conceptId)
+    ) |>
+    dplyr::pull(.data$conceptId)
 
   ancestorConceptIdsExcl <- .tibb |>
     dplyr::filter(
@@ -109,7 +110,8 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
   if (rlang::is_empty(ancestorConceptIdsExcl)) ancestorConceptIdsExcl <- -1L
   if (rlang::is_empty(includeNonDesc)) includeNonDesc <- -1L
   if (rlang::is_empty(excludeNonDesc)) excludeNonDesc <- -1L
-  sql <- SqlRender::render(sql = "
+  sql <- SqlRender::render(
+    sql = "
     SELECT include_table.descendant_concept_id ids
     FROM (
     select distinct concept_id descendant_concept_id
@@ -167,12 +169,12 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
 #' mergedConceptSet <- mergeCsAndConcepts(caprConceptSets, conceptIds = 1:2)
 #' }
 mergeCsAndConcepts <- function(x, conceptIds) {
-
-  rlang::check_installed('tidyr')
+  rlang::check_installed("tidyr")
 
   checkmate::assertVector(conceptIds,
-                          any.missing = FALSE,
-                          unique = TRUE)
+    any.missing = FALSE,
+    unique = TRUE
+  )
   checkmate::assertList(
     x,
     types = "ConceptSet",

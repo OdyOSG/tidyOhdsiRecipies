@@ -97,7 +97,7 @@ CirceR2CDMConn <- function(named_cohort_list) {
 #' @examples
 #' library(tidyOhdsiRecipies)
 #' path <- fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts")
-#' cohortsToCreate <- tidyOhdsiRecipies::createCohortsToCreate(path)
+#' cohortsToCreate <- tidyOhdsiRecipies::createCohortDefinitionSet(path)
 #' CohortSet <- cohortsToCreate2CDMConn(cohortsToCreate)
 cohortsToCreate2CDMConn <- function(cohortsToCreate) {
   checkmate::assert_data_frame(cohortsToCreate,

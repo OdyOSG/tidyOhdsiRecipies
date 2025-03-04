@@ -26,7 +26,7 @@ library(purrr)
 ## Create "study" directory
 
 ```{r}
-studyDir <- fs::dir_create(path = 'tmp')
+studyDir <- fs::dir_create(path = "tmp")
 ```
 ### Create "target" and other cohorts
 ```{r}
@@ -41,11 +41,12 @@ print(names(conceptSets))
 csBasedCohorts <- map(conceptSets, ~ createCaprConceptSetCohort(
   .x,
   # all events
-  limit = 'all',
-  end = 'fixed_exit',
+  limit = "all",
+  end = "fixed_exit",
   endArgs = list(
     # exit after 1 day after start
-    index = c("startDate"), offsetDays = 1)
+    index = c("startDate"), offsetDays = 1
+  )
 ))
 names(csBasedCohorts)
 ```
@@ -54,21 +55,21 @@ names(csBasedCohorts)
 
 ```{r}
 # option 1 create generation set from list cohorts
-cohortsToCreate <- createCohortsToCreate(cohorts = csBasedCohorts)
+cohortsToCreate <- createCohortDefinitionSet(cohorts = csBasedCohorts)
 ```
 ## Write cohorts to study directory
 ```{r}
 grid <- tibble(
-  cohort = csBasedCohorts, 
-  cohortName = names(csBasedCohorts), 
-  saveLocation= studyDir
+  cohort = csBasedCohorts,
+  cohortName = names(csBasedCohorts),
+  saveLocation = studyDir
 )
 pwalk(grid, writeListCohort)
 ```
 
 ## Create cohortToCreate from jsons 
 ```{r}
-generationSet <- createCohortsToCreate(
+generationSet <- createCohortDefinitionSet(
   path = studyDir
 )
 fs::dir_delete(studyDir)

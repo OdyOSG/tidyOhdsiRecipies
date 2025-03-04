@@ -62,7 +62,7 @@ names(cohorts)
 ```
 
 ```{r}
-cohortsToCreate <- createCohortsToCreate(
+cohortsToCreate <- createCohortDefinitionSet(
   cohorts = cohorts
 )
 head(cohortsToCreate)
