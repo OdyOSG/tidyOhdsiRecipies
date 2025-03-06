@@ -170,7 +170,6 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
 #' }
 mergeCsAndConcepts <- function(x, conceptIds) {
   rlang::check_installed("tidyr")
-
   checkmate::assertVector(conceptIds,
     any.missing = FALSE,
     unique = TRUE
@@ -180,8 +179,6 @@ mergeCsAndConcepts <- function(x, conceptIds) {
     types = "ConceptSet",
     names = "named"
   )
-
-
   nm <- names(x)
   df <- purrr::map_dfr(
     list(purrr::chuck(x, 1), Capr::cs(conceptIds, name = nm)), Capr::as.data.frame
@@ -191,7 +188,6 @@ mergeCsAndConcepts <- function(x, conceptIds) {
     dplyr::ungroup() |>
     dplyr::rename_all(snakecase::to_snake_case) |>
     dplyr::mutate(name = nm)
-
 
   name <- df[["name"]][1] %||% df[["concept_set_name"]][1]
   if (is.na(name) || is.null(name)) {

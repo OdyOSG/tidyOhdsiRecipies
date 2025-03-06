@@ -1,0 +1,77 @@
+---
+title: "Using-Caprification"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using-Caprification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tidyOhdsiRecipies)
+```
+## Construct Capr cohort from Chuncks 
+```{r}
+coh <- writeCaprstructor(
+  entryDomains  = c('condition', 'condition', 'device'),
+  firstTime = TRUE,
+  requiredObservation = c(365, 0),
+  attritionDomains = c('condition', 'drug'),
+  age = 18
+)
+## coh is a vertical class object and you need to paste the result and execute 
+## to get acual Capr definition
+print(coh)
+```
+### Using template
+
+```{r}
+## replace concept sets and adjust time relationships
+template <- Capr::cohort(entry = Capr::entry(
+  Capr::conditionOccurrence(
+    Capr::cs(1, name = "plug"),
+    Capr::startDate(Capr::bt(as.Date("2000-01-01"), as.Date("2023-12-31"))),
+    Capr::firstOccurrence(),
+    Capr::age(Capr::gte(18)), Capr::male()
+  ),
+  Capr::conditionOccurrence(
+    Capr::cs(1, name = "plug"),
+    Capr::startDate(Capr::bt(as.Date("2000-01-01"), as.Date("2023-12-31"))),
+    Capr::firstOccurrence(),
+    Capr::age(Capr::gte(18)), Capr::male()
+  ),
+  Capr::deviceExposure(
+    Capr::cs(1, name = "plug"),
+    Capr::startDate(Capr::bt(as.Date("2000-01-01"), as.Date("2023-12-31"))),
+    Capr::firstOccurrence(),
+    Capr::age(Capr::gte(18)), Capr::male()
+  ),
+  observationWindow = Capr::continuousObservation(priorDays = 365, postDays = 0),
+  primaryCriteriaLimit = "First",
+  qualifiedLimit = "First"
+), attrition = Capr::attrition(
+  conditionOccurrence_1 = Capr::withAll(
+    Capr::atLeast(
+      1,
+      Capr::conditionOccurrence(Capr::cs(1, name = "plug")),
+      Capr::duringInterval(Capr::eventStarts(-Inf, 0))
+    )
+  ), drugExposure_2 = Capr::withAll(
+    Capr::atLeast(
+      1,
+      Capr::drugExposure(Capr::cs(1, name = "plug")),
+      Capr::duringInterval(Capr::eventStarts(-Inf, 0))
+    )
+  ), expressionLimit = "First"
+), exit = Capr::exit(
+  endStrategy = Capr::observationExit()
+))
+Capr::toCirce(template)
+```

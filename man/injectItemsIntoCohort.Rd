@@ -22,11 +22,9 @@ The modified cohort with the injected items.
 This function injects items from a given ConceptSet into a specified position within a cohort's ConceptSets.
 }
 \examples{
-# Example usage:
-cohortDonor <- jsonlite::read_json(fs::path(
-  fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
-))
+\dontrun{
+cohortDonor <- returnTestDonorCohort()
 caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[[1]]
 modifiedCohort <- injectItemsIntoCohort(cohortDonor, caprConceptSets, 2)
-
+}
 }

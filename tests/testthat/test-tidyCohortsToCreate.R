@@ -12,24 +12,8 @@ test_that("write cohort test", {
 test_that("test CohortsToCreate", {
   path <- fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts")
   .res <- tidyOhdsiRecipies::createCohortDefinitionSet(path)
-  testthat::expect_named(
-    .res, c(
-      "cohortId", "cohortName", "json",
-      "sql"
-    )
-  )
-  cohort <- jsonlite::read_json(fs::path(
-    fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
-  ))
-  .res <- tidyOhdsiRecipies::createCohortDefinitionSet(
-    cohorts = list(
-      "test" = cohort
-    )
-  )
-  testthat::expect_named(
-    .res, c(
-      "cohortId", "cohortName", "json",
-      "sql"
-    )
-  )
+  testthat::expect_named(.res, c( "cohortId", "cohortName", "json",  "sql"))
+  cohort <- jsonlite::read_json(fs::path(fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"))
+  .res <- tidyOhdsiRecipies::createCohortDefinitionSet(cohorts = list("test" = cohort))
+  testthat::expect_named(.res, c("cohortId", "cohortName", "json", "sql" ))
 })

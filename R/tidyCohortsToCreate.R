@@ -98,10 +98,7 @@ createCohortDefinitionSet <- function(
 #' writeListCohort(cohort, "any_cohort", "cohorts")
 #' }
 writeListCohort <- function(cohort, cohortName, saveLocation) {
-  write(
-    RJSONIO::toJSON(cohort, pretty = TRUE),
-    fs::path(saveLocation, cohortName, ext = "json")
-  )
-
+  write(RJSONIO::toJSON(cohort, pretty = TRUE),
+    fs::path(saveLocation, cohortName, ext = "json"))
   invisible(NULL)
 }

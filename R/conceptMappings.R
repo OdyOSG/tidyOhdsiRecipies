@@ -14,10 +14,7 @@
 #' cdm <- tidyOhdsiRecipies::tidyCdmMock()
 #' conceptIds <- conceptIdsFromSources(cdm, c("63020004901"), c("NDC"))
 #' }
-conceptIdsFromSources <- function(
-    cdm,
-    listCodes,
-    vocabularyIds = c("ICD10CM")) {
+conceptIdsFromSources <- function(cdm,  listCodes, vocabularyIds = c("ICD10CM")) {
   checkmate::assertClass(cdm, "cdm_reference")
   prepCodes <- tolower(listCodes)
   prepVocab <- tolower(vocabularyIds)
@@ -46,8 +43,7 @@ conceptIdsFromSources <- function(
 #' conceptIds <- conceptIdsFromSources(cdm, c("63020004901"), c("NDC"))
 #' standardConcepts <- standardFromSourceConceptIds(cdm, conceptIds)
 #' }
-standardFromSourceConceptIds <- function(
-    cdm, sourceConceptIds) {
+standardFromSourceConceptIds <- function(cdm, sourceConceptIds) {
   checkmate::assertClass(cdm, "cdm_reference")
   standardConcepts <- cdm[["concept_relationship"]] |>
     dplyr::filter(.data$concept_id_1 %in% sourceConceptIds &

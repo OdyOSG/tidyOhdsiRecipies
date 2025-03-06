@@ -13,29 +13,44 @@
 #' cohortDonor <- jsonlite::read_json(fs::path(
 #'   fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
 #' ))
-#' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[1:2]
+#' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[c(1:2)]
 #' cohs <- purrr::map(
 #'   caprConceptSets,
 #'   ~ tidyOhdsiRecipies::createCaprConceptSetCohort(.x)
 #' )
-#' }
+#'}
 collectCaprCsFromCohort <- function(cohortDonor) {
   checkmate::assertList(cohortDonor, names = "named")
   checkmate::assertTRUE("ConceptSets" %in% names(cohortDonor))
   checkmate::assertTRUE("expression" %in% names(cohortDonor$ConceptSets[[1]]))
 
-  .all_cs <- purrr::map(
-    cohortDonor$ConceptSets, ~ purrr::pluck(.x, "expression")
-  )
-  .nms <- purrr::map_chr(
-    cohortDonor$ConceptSets,
-    ~ gsub("[^[:alnum:] ]", "", purrr::pluck(.x, "name")) |>
-      snakecase::to_lower_camel_case()
-  )
+  .all_cs <- purrr::map(cohortDonor$ConceptSets, ~ purrr::pluck(.x, "expression"))
+  .nms <- purrr::map_chr(cohortDonor$ConceptSets, ~ gsub("[^[:alnum:] ]", "",
+                                                         purrr::pluck(.x, "name")) |>
+      snakecase::to_lower_camel_case())
   caprLst <- rlang::set_names(purrr::map2(.all_cs, .nms, .getNewConceptList), .nms)
 
   return(caprLst)
 }
+
+
+#' Returns Named List Concept Ids From a Cohort
+#'
+#' @param cohort A list containing a cohort `jsonlite::read_json` or `CirceR` output definition
+#' @param con DBI or DatabaseConnector connection to database
+#' @param vocabularyDatabaseSchema schema with CDM Vocabulary tables
+#'
+#' @return named list of numeric vectors
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cIds <- collectConceptIdsFromCohorts(cohortDonor, con, 'cdm5')
+#'}
+collectConceptIdsFromCohorts <- function(cohort, con, vocabularyDatabaseSchema) {
+  return(purrr::map(collectCaprCsFromCohort(cohort), ~listConceptIdsFromCs(.x, con, vocabularyDatabaseSchema)))
+}
+
 
 #' Inject Items into a Cohort
 #'
@@ -50,13 +65,11 @@ collectCaprCsFromCohort <- function(cohortDonor) {
 #' @export
 #'
 #' @examples
-#' # Example usage:
-#' cohortDonor <- jsonlite::read_json(fs::path(
-#'   fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
-#' ))
+#' \dontrun{
+#' cohortDonor <- returnTestDonorCohort()
 #' caprConceptSets <- tidyOhdsiRecipies::collectCaprCsFromCohort(cohortDonor)[[1]]
 #' modifiedCohort <- injectItemsIntoCohort(cohortDonor, caprConceptSets, 2)
-#'
+#'}
 injectItemsIntoCohort <- function(
     cohort,
     caprCs,

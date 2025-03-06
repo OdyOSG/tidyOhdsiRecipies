@@ -63,3 +63,85 @@ getCaprCsDetails <- function(x, cdm) {
   }
   return(x)
 }
+
+#' Collects Concept Sets or Concept Ids from ingredients
+#'
+#' @param ingredients an ingredient character vector
+#' @param con DBI or DatabaseConnector connection to database
+#' @param vocabularyDatabaseSchema CDM schema with vocabulary tables
+#' @param return define what to return list of Capr or list of concept ids
+#'
+#' @return either named list of Capr concept sets or named list of numeric vectors with descendant concept ids
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cs <- collectIngredientConceptIds(
+#' 'vedolizumab', con, 'cdm5', 'Capr')
+#' }
+collectIngredientConceptIds <- function(
+    ingredients, con, vocabularyDatabaseSchema,
+    return = c('Capr', 'descendantIds')
+    ) {
+  checkmate::assert(DBI::dbIsValid(con))
+
+  checkmate::assertCharacter(ingredients, any.missing = FALSE,
+                           min.len = 1)
+
+  checkmate::assertCharacter(vocabularyDatabaseSchema)
+
+  checkmate::assertChoice(return, c('Capr', 'descendantIds'))
+  if (return == 'descendantIds') {
+    sqls <- purrr::map(ingredients, ~ SqlRender::render(
+      "select distinct descendant_concept_id
+     from @vocab_schema.concept_ancestor
+     where ancestor_concept_id IN (
+    select concept_id from @vocab_schema.concept
+    where
+    standard_concept IN ('S') and
+    concept_class_id = 'Ingredient' and
+    domain_id = 'Drug' and lower(concept_name) IN (@x)
+     )",
+      vocab_schema = vocabularyDatabaseSchema,
+      x = glue::single_quote(tolower(.x))
+    ) |> SqlRender::translate(targetDialect = dbms(con))
+    )
+    desc <- purrr::map(sqls, ~suppressWarnings(DBI::dbGetQuery(con, .x, immediate = TRUE)) |>
+      dplyr::pull(.data$descendant_concept_id)) |>
+      rlang::set_names(paste0('i_', ingredients))
+    return(desc)
+  } else if (return == 'Capr') {
+    sqls <- purrr::map(ingredients, ~ SqlRender::render(
+      "
+      select concept_id from @vocab_schema.concept
+      where   standard_concept IN ('S') and
+      concept_class_id = 'Ingredient' and
+      domain_id = 'Drug' and lower(concept_name) IN (@x)
+     ",
+      vocab_schema = vocabularyDatabaseSchema,
+      x = glue::single_quote(tolower(.x))
+    ) |> SqlRender::translate(targetDialect = dbms(con))
+    )
+    .css <- purrr::map(sqls, function(.x) {
+      cId <- suppressWarnings(DBI::dbGetQuery(con, .x, immediate = TRUE)) |>
+        dplyr::pull(.data$concept_id)
+      .cs <- Capr::cs(Capr::descendants(cId), name = .x) |>
+        Capr::getConceptSetDetails(con, vocabularyDatabaseSchema)
+    }) |>
+      rlang::set_names(paste0('i_', ingredients))
+    return(.css)
+  }
+}
+
+collectIngredients <- function(con, vocabularyDatabaseSchema) {
+  sql <- SqlRender::render(
+    "select distinct concept_name  from
+    @voc_schema.concept
+    where standard_concept IN ('S') and
+    concept_class_id = 'Ingredient' and
+    domain_id = 'Drug'",
+    voc_schema = vocabularyDatabaseSchema
+  ) |> SqlRender::translate(dbms(con))
+  res <- suppressWarnings(DBI::dbGetQuery(con, sql, immediate = TRUE)) |>
+    dplyr::pull(.data$concept_name)
+}
