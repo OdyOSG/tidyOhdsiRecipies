@@ -2,32 +2,18 @@ Package: tidyOhdsiRecipies
 Title: Methods for Working with OHDSI Tools
 Version: 0.1.0
 Authors@R: 
-    person("Alexander", "Alexeyuk", , "AlexanderAlexeyuk@gmail.com", role = c("aut", "cre"))
-Description: This package provides a set of methods for working with OHDSI (Observational Health Data Sciences and Informatics) tools, offering convenient functions for data analysis and processing.
-License: Apache License (>= 2)
-Suggests: 
-    cli,
-    DBI,
-    duckdb,
-    jsonlite,
-    readr,
-    stringi,
-    RSQLite,
-    testthat (>= 3.0.0),
-    knitr,
-    rmarkdown,
-    Eunomia,
-    tidyr,
-    styler,
-    rstudioapi,
-    withr,
-    usethis
-Config/testthat/edition: 3
+    person("Alexander", "Alexeyuk", email = "AlexanderAlexeyuk@gmail.com", role = c("aut", "cre"))
+Description: Provides tools for working with OHDSI cohort definitions. This includes methods for managing cohorts, analyzing pathways, and supporting integration with the OHDSI ecosystem.
+License: Apache License 2.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Config/testthat/edition: 3
+URL: https://github.com/OdyOSG/tidyOhdsiRecipies
+BugReports: https://github.com/OdyOSG/tidyOhdsiRecipies/issues
+Depends: 
+    R (>= 4.2)
 Imports:
-    Capr,
     CirceR,
     RJSONIO,
     DatabaseConnector,
@@ -45,8 +31,22 @@ Imports:
     omopgenerics (>= 0.4.1),
     CDMConnector (>= 1.7.0),
     SqlRender
-URL: https://github.com/OdyOSG/tidyOhdsiRecipies
-BugReports: https://github.com/OdyOSG/tidyOhdsiRecipies/issues
-Depends: 
-    R (>= 4.2)
+Suggests: 
+    cli,
+    DBI,
+    duckdb,
+    jsonlite,
+    readr,
+    stringi,
+    RSQLite,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    Eunomia,
+    tidyr,
+    styler,
+    rstudioapi,
+    withr,
+    usethis,
+    Capr
 VignetteBuilder: knitr

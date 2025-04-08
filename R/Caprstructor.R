@@ -44,6 +44,7 @@ writeCaprstructor <- function(
     exitStrategy = "observation_period_end_date",
     copyToClipboard = FALSE) {
   rlang::check_installed("usethis")
+  rlang::check_installed("Capr")
   checkmate::assertChoice(
     exitStrategy,
     c("observation_period_end_date", "fixed_exit", "drug_exit")

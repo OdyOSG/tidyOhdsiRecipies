@@ -24,6 +24,7 @@ collectCandidatesToCapr <- function(
     keywords,
     exclude = NULL,
     domains = "Condition") {
+  rlang::check_installed("Capr")
   sql_in_clause <- paste0("'", paste(stringr::str_to_lower(domains), collapse = "','"), "'")
   likePattern <- paste0("%", paste(
     stringr::str_split_1(stringr::str_to_lower(keywords), " "),
