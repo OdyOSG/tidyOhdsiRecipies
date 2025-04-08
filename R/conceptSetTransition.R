@@ -77,7 +77,7 @@ darwinCSExpression2CaprCs <- function(x) {
 #' }
 listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
   checkmate::assert(DBI::dbIsValid(con))
-  rlang::check_installed("Capr")
+
   checkmate::assert_class(x, "ConceptSet")
   checkmate::assert_character(vocabularyDatabaseSchema)
   .tibb <- Capr::as.data.frame(x)
@@ -171,7 +171,7 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
 #' }
 mergeCsAndConcepts <- function(x, conceptIds) {
   rlang::check_installed("tidyr")
-  rlang::check_installed("Capr")
+
   checkmate::assertVector(conceptIds,
     any.missing = FALSE,
     unique = TRUE

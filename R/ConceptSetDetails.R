@@ -21,7 +21,7 @@
 #' detailed_concept_set <- getCaprCsDetails(capr_concept_set, cdm)
 #' }
 getCaprCsDetails <- function(x, cdm) {
-  rlang::check_installed("Capr")
+
   checkmate::assertClass(cdm, "cdm_reference")
   checkmate::assert(methods::is(x, "ConceptSet"), is.numeric(x))
   if (!methods::is(x, "ConceptSet")) {
@@ -84,7 +84,7 @@ collectIngredientConceptIds <- function(
     ingredients, con, vocabularyDatabaseSchema,
     return = c('Capr', 'descendantIds')
     ) {
-  rlang::check_installed("Capr")
+
   checkmate::assert(DBI::dbIsValid(con))
 
   checkmate::assertCharacter(ingredients, any.missing = FALSE,

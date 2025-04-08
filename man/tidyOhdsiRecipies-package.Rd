@@ -6,7 +6,7 @@
 \alias{tidyOhdsiRecipies-package}
 \title{tidyOhdsiRecipies: Methods for Working with OHDSI Tools}
 \description{
-This package provides a set of methods for working with OHDSI (Observational Health Data Sciences and Informatics) tools, offering convenient functions for data analysis and processing.
+Provides tools for working with OHDSI cohort definitions. This includes methods for managing cohorts, analyzing pathways, and supporting integration with the OHDSI ecosystem.
 }
 \seealso{
 Useful links:

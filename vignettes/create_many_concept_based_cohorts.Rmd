@@ -25,6 +25,7 @@ Load required packages
 library(tidyOhdsiRecipies)
 library(dplyr)
 library(fs)
+rlang::check_installed("Capr")
 ```
 #### For this puprose we will use PHN.json cohort located in inst/cohorts directory
 

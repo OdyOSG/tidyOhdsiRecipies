@@ -2,6 +2,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @import Capr
 #' @importFrom CDMConnector dbms
 #' @importFrom glue glue
 #' @importFrom glue glue_sql_collapse

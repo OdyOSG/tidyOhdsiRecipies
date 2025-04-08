@@ -20,7 +20,7 @@
 #' )
 #'}
 collectCaprCsFromCohort <- function(cohortDonor) {
-  rlang::check_installed("Capr")
+
   checkmate::assertList(cohortDonor, names = "named")
   checkmate::assertTRUE("ConceptSets" %in% names(cohortDonor))
   checkmate::assertTRUE("expression" %in% names(cohortDonor$ConceptSets[[1]]))
@@ -76,7 +76,7 @@ injectItemsIntoCohort <- function(
     caprCs,
     position,
     writeCohortPath = NULL) {
-  rlang::check_installed("Capr")
+
   csLength <- length(cohort$ConceptSets)
   checkmate::assertTRUE(csLength > 0)
   checkmate::assertClass(caprCs, "ConceptSet")

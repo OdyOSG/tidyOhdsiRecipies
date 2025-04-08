@@ -28,6 +28,7 @@ library(tidyOhdsiRecipies)
 library(dplyr)
 library(Capr)
 rlang::check_installed("Eunomia")
+rlang::check_installed("Capr")
 ```
 
 

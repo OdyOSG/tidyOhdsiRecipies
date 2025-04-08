@@ -29,7 +29,7 @@
 #' cohortSet <- CirceR2CDMConn(named_cohort_list)
 #' }
 CirceR2CDMConn <- function(named_cohort_list) {
-  rlang::check_installed("Capr")
+
   checkmate::assertList(
     named_cohort_list,
     min.len = 1,
@@ -101,7 +101,7 @@ CirceR2CDMConn <- function(named_cohort_list) {
 #' cohortsToCreate <- tidyOhdsiRecipies::createCohortDefinitionSet(path)
 #' CohortSet <- cohortsToCreate2CDMConn(cohortsToCreate)
 cohortsToCreate2CDMConn <- function(cohortsToCreate) {
-  rlang::check_installed("Capr")
+
   checkmate::assert_data_frame(cohortsToCreate,
     min.rows = 1,
     min.cols = 4

@@ -1,9 +1,9 @@
 Package: tidyOhdsiRecipies
-Title: Methods for Working with OHDSI Tools
+Title: Methods for Working with Observational Health Data Sciences and Informatics Tools
 Version: 0.1.0
 Authors@R: 
     person("Alexander", "Alexeyuk", email = "AlexanderAlexeyuk@gmail.com", role = c("aut", "cre"))
-Description: Provides tools for working with OHDSI cohort definitions. This includes methods for managing cohorts, analyzing pathways, and supporting integration with the OHDSI ecosystem.
+Description: Provides tools for working with Observational Health Data Sciences and Informatics (OHDSI) cohort definitions. This includes methods for managing cohorts, analyzing pathways, and supporting integration with the OHDSI ecosystem.
 License: Apache License 2.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -12,6 +12,7 @@ Config/testthat/edition: 3
 URL: https://github.com/OdyOSG/tidyOhdsiRecipies
 BugReports: https://github.com/OdyOSG/tidyOhdsiRecipies/issues
 Depends: 
+    Capr,
     R (>= 4.2)
 Imports:
     CirceR,
@@ -47,6 +48,5 @@ Suggests:
     styler,
     rstudioapi,
     withr,
-    usethis,
-    Capr
+    usethis
 VignetteBuilder: knitr

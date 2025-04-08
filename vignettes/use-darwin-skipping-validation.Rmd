@@ -27,6 +27,7 @@ library(tidyOhdsiRecipies)
 suppressPackageStartupMessages(library(dplyr))
 library(CDMConnector)
 library(fs)
+rlang::check_installed("Capr")
 ```
 
 ```{r}
