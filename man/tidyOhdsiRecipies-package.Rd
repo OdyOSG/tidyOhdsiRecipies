@@ -4,9 +4,9 @@
 \name{tidyOhdsiRecipies-package}
 \alias{tidyOhdsiRecipies}
 \alias{tidyOhdsiRecipies-package}
-\title{tidyOhdsiRecipies: Methods for Working with OHDSI Tools}
+\title{tidyOhdsiRecipies: Methods for Working with Observational Health Data Sciences and Informatics Tools}
 \description{
-Provides tools for working with OHDSI cohort definitions. This includes methods for managing cohorts, analyzing pathways, and supporting integration with the OHDSI ecosystem.
+Provides tools for working with Observational Health Data Sciences and Informatics (OHDSI) cohort definitions. This includes methods for managing cohorts, analyzing pathways, and supporting integration with the OHDSI ecosystem.
 }
 \seealso{
 Useful links:
