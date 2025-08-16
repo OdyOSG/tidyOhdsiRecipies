@@ -22,6 +22,11 @@
 #' }
 getCaprCsDetails <- function(x, cdm) {
   checkmate::assertClass(cdm, "cdm_reference")
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
   checkmate::assert(methods::is(x, "ConceptSet"), is.numeric(x))
   if (!methods::is(x, "ConceptSet")) {
     x <- Capr::cs(x, name = paste0(".name_", x[[1]]))
@@ -91,6 +96,13 @@ collectIngredientConceptIds <- function(
   checkmate::assertCharacter(vocabularyDatabaseSchema)
 
   checkmate::assertChoice(return, c('Capr', 'descendantIds'))
+  
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
+  
   if (return == 'descendantIds') {
     sqls <- purrr::map(ingredients, ~ SqlRender::render(
       "select distinct descendant_concept_id
