@@ -46,6 +46,11 @@ createCaprConceptSetCohort <- function(
       offsetDays = 7
     ),
     addSourceCriteria = FALSE) {
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
   checkmate::assert_class(conceptSet, "ConceptSet")
   checkmate::assertIntegerish(
     requiredObservation,

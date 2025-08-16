@@ -1,4 +1,5 @@
 test_that("test CirceR to CDM CohortSet", {
+  skip_if_not_installed("Capr")
   cdm <- tidyOhdsiRecipies::tidyCdmMock()
   caprCs1 <- Capr::cs(4133224, name = "lobar pneumonia")
   caprCs2 <- Capr::cs(45176377, name = "velcade")

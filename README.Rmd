@@ -33,6 +33,19 @@ You can install the development version of tidyOhdsiRecipies like so:
 remotes::install_github('OdyOSG/tidyOhdsiRecipies')
 ```
 
+## Optional Dependencies
+
+This package has an optional dependency on the `Capr` package, which provides advanced cohort building capabilities. Many functions in tidyOhdsiRecipies will work without Capr, but some features require it.
+
+If you want to use Capr-dependent features (such as `collectCaprCsFromCohort()`, `createCaprConceptSetCohort()`, etc.), you can install Capr from GitHub:
+
+``` r
+# Install Capr from GitHub
+remotes::install_github('OHDSI/Capr')
+```
+
+Functions that require Capr will provide a helpful error message if you try to use them without having Capr installed.
+
 ## Example
 
 Reading json cohorts representation to `CohortGenerator` definition set
@@ -72,7 +85,3 @@ cohortsToCreate <- createCohortDefinitionSet(
 )
 
 ```
-
-
-
-

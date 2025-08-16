@@ -20,6 +20,12 @@
 #' )
 #'}
 collectCaprCsFromCohort <- function(cohortDonor) {
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
+  
   checkmate::assertList(cohortDonor, names = "named")
   checkmate::assertTRUE("ConceptSets" %in% names(cohortDonor))
   checkmate::assertTRUE("expression" %in% names(cohortDonor$ConceptSets[[1]]))
@@ -75,6 +81,12 @@ injectItemsIntoCohort <- function(
     caprCs,
     position,
     writeCohortPath = NULL) {
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
+  
   csLength <- length(cohort$ConceptSets)
   checkmate::assertTRUE(csLength > 0)
   checkmate::assertClass(caprCs, "ConceptSet")
@@ -110,6 +122,12 @@ returnTestDonorCohort <- function() {
 }
 
 .getNewConceptList <- function(.expression, .nm) {
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
+  
   expression <- list()
   expression$items <- .removeItemDuplicates(
     purrr::pluck(.expression, "items")
@@ -143,7 +161,11 @@ returnTestDonorCohort <- function() {
   }
   return(uniqueItems)
 }
-newConcept <- getFromNamespace("newConcept", "Capr")
+newConcept <- if (requireNamespace("Capr", quietly = TRUE)) {
+  Capr::newConcept
+} else {
+  getFromNamespace("newConcept", "Capr")
+}
 
 .fAsListItem <- function(x) {
   list(
