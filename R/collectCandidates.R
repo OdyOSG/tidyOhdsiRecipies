@@ -24,6 +24,11 @@ collectCandidatesToCapr <- function(
     keywords,
     exclude = NULL,
     domains = "Condition") {
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
   sql_in_clause <- paste0("'", paste(stringr::str_to_lower(domains), collapse = "','"), "'")
   likePattern <- paste0("%", paste(
     stringr::str_split_1(stringr::str_to_lower(keywords), " "),
