@@ -18,6 +18,11 @@
 #'   ))
 #' )
 darwinCSExpression2CaprCs <- function(x) {
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
   .nm <- names(x)
   x <- purrr::pluck(x, .nm)
   items <- purrr::map(
@@ -77,6 +82,11 @@ darwinCSExpression2CaprCs <- function(x) {
 #' }
 listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
   checkmate::assert(DBI::dbIsValid(con))
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
   checkmate::assert_class(x, "ConceptSet")
   checkmate::assert_character(vocabularyDatabaseSchema)
   .tibb <- Capr::as.data.frame(x)
@@ -169,6 +179,11 @@ listConceptIdsFromCs <- function(x, con, vocabularyDatabaseSchema) {
 #' mergedConceptSet <- mergeCsAndConcepts(caprConceptSets, conceptIds = 1:2)
 #' }
 mergeCsAndConcepts <- function(x, conceptIds) {
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
   rlang::check_installed("tidyr")
   checkmate::assertVector(conceptIds,
     any.missing = FALSE,
