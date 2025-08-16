@@ -139,6 +139,7 @@ test_that("Tidy CDM Referrence test", {
 })
 
 test_that("Tidy Generate From CDM", {
+  skip_if_not_installed("Capr")
   cdm <- tidyOhdsiRecipies::tidyCdmMock()
   caprCs1 <- Capr::cs(4133224, name = "lobar pneumonia")
   csWithDetails <- purrr::map(
@@ -162,4 +163,3 @@ test_that("Tidy Generate From CDM", {
   testthat::expect_gt(nrow(.res), 0)
   CDMConnector::cdmDisconnect(cdm)
 })
-
