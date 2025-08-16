@@ -1,6 +1,7 @@
 library(tidyOhdsiRecipies)
 library(testthat)
 test_that("Concepts From Cohort", {
+  skip_if_not_installed("Capr")
   cohortDonor <- jsonlite::read_json(fs::path(
     fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
   ))
@@ -10,6 +11,7 @@ test_that("Concepts From Cohort", {
   testthat::expect_identical(returnTestDonorCohort(), cohortDonor)
 })
 test_that("Cs Details ", {
+  skip_if_not_installed("Capr")
   cdm <- tidyOhdsiRecipies::tidyCdmMock()
   caprCs1 <- 4133224L
   csWithDetails <- tidyOhdsiRecipies::getCaprCsDetails(caprCs1, cdm)
@@ -20,6 +22,7 @@ test_that("Cs Details ", {
   CDMConnector::cdmDisconnect(cdm)
 })
 test_that("Cs Candidates", {
+  skip_if_not_installed("Capr")
   con <- tidyOhdsiRecipies::returnSqLiteDatabaseConnectorCon()
   caprCand <- suppressWarnings(tidyOhdsiRecipies::collectCandidatesToCapr(
     con, "main", c("pneumonia"), "lll"
@@ -28,6 +31,7 @@ test_that("Cs Candidates", {
   testthat::expect_s4_class(caprCand, "ConceptSet")
 })
 test_that("Inject Itest", {
+  skip_if_not_installed("Capr")
   cohortDonor <- jsonlite::read_json(fs::path(
     fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
   ))
