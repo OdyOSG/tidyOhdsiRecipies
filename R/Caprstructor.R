@@ -4,7 +4,7 @@
 #' cohort using a set of arguments.
 #' Most often, difficulties with using Capr arise
 #' due to a lack of understanding of the
-#' structure and the problem of “where to start”
+#' structure and the problem of "where to start"
 #' Therefore, `writeCaprstructor` allows you to get a
 #' structure with the necessary fields.
 #'
@@ -44,6 +44,11 @@ writeCaprstructor <- function(
     exitStrategy = "observation_period_end_date",
     copyToClipboard = FALSE) {
   rlang::check_installed("usethis")
+  if (!requireNamespace("Capr", quietly = TRUE)) {
+    stop("Package 'Capr' is needed for this function to work. Please install it from GitHub using:\n",
+         "remotes::install_github('OHDSI/Capr')", 
+         call. = FALSE)
+  }
   checkmate::assertChoice(
     exitStrategy,
     c("observation_period_end_date", "fixed_exit", "drug_exit")
