@@ -1,4 +1,5 @@
 test_that("Cs Transition Test", {
+  skip_if_not_installed("Capr")
   caprCs <- tidyOhdsiRecipies::darwinCSExpression2CaprCs(
     list(test_set = dplyr::tibble(
       concept_id = c(1, 2),
@@ -12,6 +13,7 @@ test_that("Cs Transition Test", {
 
 
 testthat::test_that("Cs To List Concept Ids", {
+  skip_if_not_installed("Capr")
   library(DatabaseConnector)
   con <- tidyOhdsiRecipies::returnSqLiteDatabaseConnectorCon()
   diclofenac <- Capr::cs(Capr::descendants(1124300), name = "diclofenac")
@@ -24,6 +26,7 @@ testthat::test_that("Cs To List Concept Ids", {
 
 
 test_that("mergeCsAndConcepts", {
+  skip_if_not_installed("Capr")
   cohortDonor <- jsonlite::read_json(fs::path(
     fs::path_package("tidyOhdsiRecipies"), "cohorts", "PHN.json"
   ))
