@@ -21,13 +21,13 @@ Suggests:
     styler,
     rstudioapi,
     withr,
-    usethis
+    usethis,
+    Capr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
-    Capr,
     CirceR,
     RJSONIO,
     DatabaseConnector,
