@@ -6,3 +6,5 @@
 .quarto
 inst/doc
 extra/
+testing/
+.idea/

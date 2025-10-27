@@ -12,9 +12,9 @@ Config/testthat/edition: 3
 URL: https://github.com/OdyOSG/tidyOhdsiRecipies
 BugReports: https://github.com/OdyOSG/tidyOhdsiRecipies/issues
 Depends: 
-    Capr,
     R (>= 4.2)
 Imports:
+    Capr,
     CirceR,
     RJSONIO,
     DatabaseConnector,

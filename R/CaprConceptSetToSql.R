@@ -1,0 +1,65 @@
+#' Convert Capr Concept Set to SQL Query
+#'
+#' Converts a Capr concept set object to an SQL query that can be used to retrieve
+#' the corresponding concepts from an OMOP CDM database. The function serializes
+#' the Capr concept set to JSON format and then uses CirceR to build the SQL query.
+#'
+#' @param caprCs A Capr concept set object. This should be a concept set created
+#'   using the Capr package, typically containing OMOP concept definitions with
+#'   properties such as concept IDs, inclusion/exclusion flags, and descendant
+#'   inclusion settings.
+#'
+#' @returns A character string containing the SQL query that can be executed
+#'   against an OMOP CDM database to retrieve all concepts matching the concept
+#'   set definition, including descendants if specified.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Load example donor cohort and extract concept sets
+#' conceptSetsCapr <- tidyOhdsiRecipies::returnTestDonorCohort() |>
+#'   tidyOhdsiRecipies::collectCaprCsFromCohort()
+#'
+#' # Get the Herpes zoster concept set
+#' caprCs <- conceptSetsCapr$hz
+#'
+#' # Convert to SQL query
+#' sql_query <- caprConceptSetToSql(caprCs)
+#'
+#' # View the generated SQL
+#' cat(sql_query)
+#'
+#' # Example with a manually created concept set
+#' library(Capr)
+#' my_concept_set <- cs(
+#'   descendants(443943), # Herpes zoster
+#'   name = "Herpes Zoster"
+#' )
+#' sql <- caprConceptSetToSql(my_concept_set)
+#' }
+#'
+#' @seealso
+#' \code{\link[Capr]{as.json}} for converting Capr objects to JSON,
+#' \code{\link[CirceR]{buildConceptSetQuery}} for building SQL from concept set JSON
+#'
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'   \item Converts the Capr concept set to JSON format using \code{Capr::as.json()}
+#'   \item Passes the JSON to \code{CirceR::buildConceptSetQuery()} to generate SQL
+#'   \item Returns the SQL query as a character string
+#' }
+#'
+#' The generated SQL query will typically include:
+#' \itemize{
+#'   \item Direct concept ID matches
+#'   \item Descendant concepts (if includeDescendants is TRUE)
+#'   \item Mapped concepts (if includeMapped is TRUE)
+#'   \item Exclusions (if any concepts are marked as excluded)
+#' }
+caprConceptSetToSql <- function(caprCs) {
+  .sql <- as.character(Capr::as.json(caprCs)) |>
+    CirceR::buildConceptSetQuery()
+  return(.sql)
+}
